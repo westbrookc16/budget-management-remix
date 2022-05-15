@@ -18,10 +18,11 @@ export async function action({ request }) {
       const id = data.get("id");
       const income = data.get("income");
       const user_id = data.get("user_id");
-
+      const _action = data.get("_action");
       const month = data.get("month");
       const year = data.get("year");
       console.log(`year=${year}`);
+      if (_action === "select") return null;
       if (id === "-1") {
         console.log("insert");
         await supabaseAdmin.from("budgets").insert({
@@ -46,13 +47,13 @@ export async function loader({ request }) {
   const url = new URL(request.url);
   const month = url.searchParams.get("month");
   const year = url.searchParams.get("year");
-  if (month === null || year === null) {
+  /*if (month === null || year === null) {
     return redirect(
       `/budget?month=${
         new Date().getMonth() + 1
       }&year=${new Date().getFullYear()}`
     );
-  }
+  }*/
   //get user id
   const accessToken = await getAccessToken(request);
 
@@ -61,6 +62,7 @@ export async function loader({ request }) {
     .from("budgets")
     .select()
     .match({ month, year });
+  console.log(data);
   console.log(error);
   if (!data || data?.length === 0) {
     return json({ id: -1, month, year, income: 0, user_id: "" });
@@ -107,7 +109,7 @@ export default function Budget() {
           Select
         </button>
       </Form>
-      <Form method="post">
+      <Form method="post" replace>
         <input type="hidden" name="id" value={id} />
         <label htmlFor="income">Income</label>
         <input id="income" type="text" name="income" defaultValue={income} />
@@ -123,7 +125,7 @@ export default function Budget() {
         <input type="hidden" name="month" value={month} />
         <input type="hidden" name="year" value={year} />
       </Form>
-      <a href={`categories/${id}`}>View/Edit Categories</a>
+      {id > 0 && <a href={`categories/${id}`}>View/Edit Categories</a>}
     </div>
   );
 }

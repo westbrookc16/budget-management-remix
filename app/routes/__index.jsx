@@ -11,7 +11,7 @@ export const loader = async ({ request }) => {
   const { user, error: getUserError } = await getUserByAccessToken(
     authSession.get("access_token")
   );
-  //console.log(getUserError);
+
   return json({ user });
 };
 
@@ -31,7 +31,13 @@ export default function IndexLayout() {
                 <Link to="/profile">Profile</Link>
               </li>
               <li style={{ margin: 4 }}>
-                <Link to="/budget">Budget Management</Link>
+                <Link
+                  to={`/budget?month=${
+                    new Date().getMonth() + 1
+                  }&year=${new Date().getFullYear()}`}
+                >
+                  Budget Management
+                </Link>
               </li>
             </>
           ) : (

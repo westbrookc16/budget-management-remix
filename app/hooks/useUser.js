@@ -5,7 +5,7 @@ function useRouteData(routeId) {
 }
 
 export default function useUser() {
-  const loaderData = useRouteData("routes/__budgetManagement");
+  const loaderData = useRouteData("routes/__authenticated");
   if (!loaderData?.user) {
     throw new Error("User not found");
   }
