@@ -5,36 +5,41 @@ import {
   useSearchParams,
   useTransition,
 } from "@remix-run/react";
-import { SupabaseClient } from "@supabase/supabase-js";
-import authenticated from "../policies/authenticated.server";
-import { supabaseAdmin } from "../services/supabase.server";
+
+import { supabaseAdmin } from "~/services/supabase.server";
+import { getAccessToken } from "~/policies/authenticated.server";
+import authenticated from "~/policies/authenticated.server";
+
 export async function action({ request }) {
-  const data = await request.formData();
-  const id = data.get("id");
-  const income = data.get("income");
-  const user_id = data.get("user_id");
-  const url = new URL(request.url);
-  const searchParams = url.searchParams;
-  const month = data.get("month");
-  const year = data.get("year");
-  console.log(`year=${year}`);
-  if (id === "-1") {
-    console.log("insert");
-    const { data, error } = await supabaseAdmin.from("budgets").insert({
-      month,
-      year,
-      user_id,
-      income,
-    });
-    console.log(error);
-    return data;
-  } else {
-    console.log("update");
-    const { data, error } = await supabaseAdmin
-      .from("budgets")
-      .update({ id, income })
-      .match({ id });
-  }
+  await authenticated(
+    request,
+    async (user) => {
+      const data = await request.formData();
+      const id = data.get("id");
+      const income = data.get("income");
+      const user_id = data.get("user_id");
+
+      const month = data.get("month");
+      const year = data.get("year");
+      console.log(`year=${year}`);
+      if (id === "-1") {
+        console.log("insert");
+        await supabaseAdmin.from("budgets").insert({
+          month,
+          year,
+          user_id,
+          income,
+        });
+      } else {
+        console.log("update");
+        supabaseAdmin.auth.setAuth(await getAccessToken(request));
+        await supabaseAdmin.from("budgets").update({ income }).match({ id });
+      }
+    },
+    () => {
+      throw new Response("unauthorized", { status: 401 });
+    }
+  );
   return null;
 }
 export async function loader({ request }) {
@@ -49,23 +54,16 @@ export async function loader({ request }) {
     );
   }
   //get user id
-  const userData = await authenticated(
-    request,
-    (user) => {
-      return user.user_id;
-    },
-    () => {
-      console.log("failed");
-      return redirect("/login");
-    }
-  );
+  const accessToken = await getAccessToken(request);
+
+  supabaseAdmin.auth.setAuth(accessToken);
   const { data, error } = await supabaseAdmin
     .from("budgets")
     .select()
     .match({ month, year });
-
-  if (data.length === 0) {
-    return json({ id: -1, month, year, income: 0, user_id: userData });
+  console.log(error);
+  if (!data || data?.length === 0) {
+    return json({ id: -1, month, year, income: 0, user_id: "" });
   } else {
     return json(data[0]);
   }
@@ -125,6 +123,7 @@ export default function Budget() {
         <input type="hidden" name="month" value={month} />
         <input type="hidden" name="year" value={year} />
       </Form>
+      <a href={`categories/${id}`}>View/Edit Categories</a>
     </div>
   );
 }

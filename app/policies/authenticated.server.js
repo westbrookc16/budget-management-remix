@@ -1,4 +1,3 @@
-import { redirect } from "@remix-run/node";
 import {
   getUserByAccessToken,
   hasActiveAuthSession,
@@ -6,6 +5,9 @@ import {
   setAuthSession,
 } from "~/api/supabase-auth.server";
 import { authCookie } from "~/services/supabase.server";
+
+import { redirect } from "@remix-run/node";
+
 import { supabaseAdmin } from "../services/supabase.server";
 
 export default async function authenticated(
@@ -56,4 +58,9 @@ export default async function authenticated(
     console.log(error); // You should log this error to your logging system
     return failureFunction();
   }
+}
+export async function getAccessToken(request) {
+  let session = await authCookie.getSession(request.headers.get("Cookie"));
+  const userAccessToken = session.get("access_token");
+  return userAccessToken;
 }

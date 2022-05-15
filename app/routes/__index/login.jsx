@@ -1,11 +1,23 @@
-import { useMemo } from "react";
+import { useMemo } from 'react';
 
-import { Form, Link, useActionData, useSearchParams } from "@remix-run/react";
-import { json, redirect } from "@remix-run/node";
-import { loginUser, setAuthSession } from "~/api/supabase-auth.server";
-import AuthProviderBtn from "~/components/AuthProviderBtn";
-import authenticated from "~/policies/authenticated.server";
-import { authCookie } from "~/services/supabase.server";
+import {
+  loginUser,
+  setAuthSession,
+} from '~/api/supabase-auth.server';
+import AuthProviderBtn from '~/components/AuthProviderBtn';
+import authenticated from '~/policies/authenticated.server';
+import { authCookie } from '~/services/supabase.server';
+
+import {
+  json,
+  redirect,
+} from '@remix-run/node';
+import {
+  Form,
+  Link,
+  useActionData,
+  useSearchParams,
+} from '@remix-run/react';
 
 export function meta() {
   return { title: "Supabase x Remix | Login" };
