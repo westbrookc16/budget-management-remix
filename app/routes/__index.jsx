@@ -32,9 +32,9 @@ export default function IndexLayout() {
               </li>
               <li style={{ margin: 4 }}>
                 <Link
-                  to={`/budget?month=${
+                  to={`/budget/${
                     new Date().getMonth() + 1
-                  }&year=${new Date().getFullYear()}`}
+                  }/${new Date().getFullYear()}`}
                 >
                   Budget Management
                 </Link>

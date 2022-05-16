@@ -7,46 +7,59 @@ import {
 } from "@remix-run/react";
 
 import { supabaseAdmin } from "~/services/supabase.server";
+import { getUserByAccessToken } from "~/api/supabase-auth.server";
 import { getAccessToken } from "~/policies/authenticated.server";
 import authenticated from "~/policies/authenticated.server";
-
+import useUser from "~/hooks/useUser";
 export async function action({ request }) {
-  await authenticated(
+  return authenticated(
     request,
     async (user) => {
       const data = await request.formData();
       const id = data.get("id");
       const income = data.get("income");
-      const user_id = data.get("user_id");
+
+      const { user_id } = user;
       const _action = data.get("_action");
       const month = data.get("month");
       const year = data.get("year");
       console.log(`year=${year}`);
-      if (_action === "select") return null;
+      if (_action === "select") {
+        console.log(`select`);
+        return redirect(`/budget/${month}/${year}`);
+      }
+      supabaseAdmin.auth.setAuth(await getAccessToken(request));
       if (id === "-1") {
         console.log("insert");
-        await supabaseAdmin.from("budgets").insert({
+        const { error } = await supabaseAdmin.from("budgets").insert({
           month,
           year,
           user_id,
           income,
         });
+        console.log(`insertError=${error}`);
       } else {
         console.log("update");
         supabaseAdmin.auth.setAuth(await getAccessToken(request));
         await supabaseAdmin.from("budgets").update({ income }).match({ id });
       }
+      return null;
     },
     () => {
       throw new Response("unauthorized", { status: 401 });
     }
   );
-  return null;
 }
-export async function loader({ request }) {
-  const url = new URL(request.url);
-  const month = url.searchParams.get("month");
-  const year = url.searchParams.get("year");
+export async function loader({ request, params }) {
+  //console.log(`url=${url}`);
+  let { month, year } = params;
+
+  if (month === null) {
+    //get data from form
+    console.log("bad error.");
+    return null;
+  }
+
   /*if (month === null || year === null) {
     return redirect(
       `/budget?month=${
@@ -63,7 +76,7 @@ export async function loader({ request }) {
     .select()
     .match({ month, year });
   console.log(data);
-  console.log(error);
+  console.log(`selectError=${JSON.stringify(error, null, 2)}`);
   if (!data || data?.length === 0) {
     return json({ id: -1, month, year, income: 0, user_id: "" });
   } else {
@@ -75,14 +88,12 @@ export async function loader({ request }) {
 export default function Budget() {
   const [searchParams] = useSearchParams();
   const transition = useTransition();
-  const { income, id, user_id } = useLoaderData();
+  const { income, id, user_id, month, year } = useLoaderData();
 
-  const month = searchParams.get("month");
-  const year = searchParams.get("year");
   //const id = searchParams.get("id");
   return (
     <div>
-      <Form method="get">
+      <Form method="post">
         <label htmlFor="month">Month</label>
         <select defaultValue={month} id="month" name="month">
           <option value="1">Jan</option>
@@ -105,8 +116,14 @@ export default function Budget() {
           <option>2022</option>
           <option>2023</option>
         </select>
-        <button type="submit" name="_action" value="select">
-          Select
+        <button
+          type="submit"
+          name="_action"
+          value="select"
+          aria-live="polite"
+          disabled={transition.state !== "idle"}
+        >
+          {transition.state === "idle" ? `Select` : `Loading`}
         </button>
       </Form>
       <Form method="post" replace>
@@ -125,7 +142,7 @@ export default function Budget() {
         <input type="hidden" name="month" value={month} />
         <input type="hidden" name="year" value={year} />
       </Form>
-      {id > 0 && <a href={`categories/${id}`}>View/Edit Categories</a>}
+      {id > 0 && <a href={`/categories/${id}`}>View/Edit Categories</a>}
     </div>
   );
 }

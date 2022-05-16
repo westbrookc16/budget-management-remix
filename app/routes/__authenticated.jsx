@@ -31,7 +31,13 @@ export default function BudgetManagementLayout() {
             <Link to="/settings">Settings</Link>
           </li>
           <li style={{ margin: 4 }}>
-            <Link to="/budget">Budget Management</Link>
+            <Link
+              to={`/budget/${
+                new Date().getMonth() + 1
+              }/${new Date().getFullYear()}`}
+            >
+              Budget Management
+            </Link>
           </li>
         </ul>
       </header>
