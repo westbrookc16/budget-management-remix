@@ -56,7 +56,7 @@ function Layout({ children }) {
               <a
                 target="_blank"
                 rel="noopener noreferrer"
-                href="https://twitter.com/_arpit_dalal_"
+                href="https://twitter.com/chriswestbrook"
               >
                 Twitter
               </a>
