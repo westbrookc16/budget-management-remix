@@ -1,5 +1,5 @@
 import authenticated from "~/policies/authenticated.server";
-
+import { Form } from "@remix-run/react";
 import { json } from "@remix-run/node";
 import { Link, Outlet, useCatch } from "@remix-run/react";
 
@@ -38,6 +38,11 @@ export default function BudgetManagementLayout() {
             >
               Budget Management
             </Link>
+          </li>
+          <li>
+            <Form method="post" action="/api/logout">
+              <button type="submit">Logout</button>
+            </Form>
           </li>
         </ul>
       </header>

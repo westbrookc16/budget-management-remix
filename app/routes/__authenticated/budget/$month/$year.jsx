@@ -1,4 +1,5 @@
 import { json, redirect } from "@remix-run/node";
+
 import {
   Form,
   useLoaderData,
@@ -7,10 +8,14 @@ import {
 } from "@remix-run/react";
 
 import { supabaseAdmin } from "~/services/supabase.server";
-import { getUserByAccessToken } from "~/api/supabase-auth.server";
+//import { getUserByAccessToken } from "~/api/supabase-auth.server";
 import { getAccessToken } from "~/policies/authenticated.server";
 import authenticated from "../../../../policies/authenticated.server";
-import useUser from "../../../../hooks/useUser";
+
+import { useEffect, useState } from "react";
+export function meta() {
+  return { title: "Budget Management|Main Console" };
+}
 export async function action({ request }) {
   return authenticated(
     request,
@@ -86,11 +91,14 @@ export async function loader({ request, params }) {
 
 //}
 export default function Budget() {
-  const [searchParams] = useSearchParams();
   const transition = useTransition();
   const { income, id, user_id, month, year } = useLoaderData();
-
+  const [incomeTxt, setIncomeTxt] = useState("");
+  useEffect(() => {
+    setIncomeTxt(income);
+  }, [income]);
   //const id = searchParams.get("id");
+
   return (
     <div>
       <Form method="post">
@@ -123,25 +131,33 @@ export default function Budget() {
           aria-live="polite"
           disabled={transition.state !== "idle"}
         >
-          {transition.state === "idle" ? `Select` : `Loading`}
+          Select
         </button>
-      </Form>
-      <Form method="post" replace>
+
         <input type="hidden" name="id" value={id} />
         <label htmlFor="income">Income</label>
-        <input id="income" type="text" name="income" defaultValue={income} />
+        <input
+          id="income"
+          type="text"
+          name="income"
+          readonly={transition.state !== "idle"}
+          value={incomeTxt}
+          onChange={(e) => {
+            e.preventDefault();
+            setIncomeTxt(e.target.value);
+          }}
+        />
         <button
           type="submit"
           _action="update"
-          disabled={transition.state === "submitting"}
+          disabled={transition.state !== "idle"}
           aria-live="polite"
         >
           Update
         </button>
         <input type="hidden" name="user_id" value={user_id} />
-        <input type="hidden" name="month" value={month} />
-        <input type="hidden" name="year" value={year} />
       </Form>
+
       {id > 0 && <a href={`/categories/${id}`}>View/Edit Categories</a>}
     </div>
   );

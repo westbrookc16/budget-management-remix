@@ -13,7 +13,7 @@ import {
 
 export function meta() {
   return {
-    title: "Supabase x Remix",
+    title: "Budget Management",
     description:
       "Bare minimum and un-opinionated example using Remix to implement Supabase's email/password and social auth",
   };

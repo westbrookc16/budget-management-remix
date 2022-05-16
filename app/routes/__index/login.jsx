@@ -1,26 +1,15 @@
-import { useMemo } from 'react';
+import { useMemo } from "react";
 
-import {
-  loginUser,
-  setAuthSession,
-} from '~/api/supabase-auth.server';
-import AuthProviderBtn from '~/components/AuthProviderBtn';
-import authenticated from '~/policies/authenticated.server';
-import { authCookie } from '~/services/supabase.server';
+import { loginUser, setAuthSession } from "~/api/supabase-auth.server";
+import AuthProviderBtn from "~/components/AuthProviderBtn";
+import authenticated from "~/policies/authenticated.server";
+import { authCookie } from "~/services/supabase.server";
 
-import {
-  json,
-  redirect,
-} from '@remix-run/node';
-import {
-  Form,
-  Link,
-  useActionData,
-  useSearchParams,
-} from '@remix-run/react';
+import { json, redirect } from "@remix-run/node";
+import { Form, Link, useActionData, useSearchParams } from "@remix-run/react";
 
 export function meta() {
-  return { title: "Supabase x Remix | Login" };
+  return { title: "Budget Management| Login" };
 }
 
 export async function loader({ request }) {
@@ -85,7 +74,9 @@ export default function Login() {
   const [searchParams] = useSearchParams();
 
   const redirectTo = useMemo(
-    () => searchParams.get("redirectTo") ?? "/profile",
+    () =>
+      searchParams.get("redirectTo") ??
+      `/budget/${new Date().getMonth() + 1}/${new Date().getFullYear()}`,
     [searchParams]
   );
 

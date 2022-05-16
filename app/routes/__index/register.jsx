@@ -6,7 +6,7 @@ import AuthProviderBtn from "~/components/AuthProviderBtn";
 import authenticated from "~/policies/authenticated.server";
 
 export function meta() {
-  return { title: "Supabase x Remix | Register" };
+  return { title: "Budget Management| Register" };
 }
 
 export async function loader({ request }) {
