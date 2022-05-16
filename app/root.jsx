@@ -1,4 +1,4 @@
-import { json } from '@remix-run/node';
+import { json } from "@remix-run/node";
 import {
   Link,
   Links,
@@ -9,7 +9,7 @@ import {
   ScrollRestoration,
   useCatch,
   useLoaderData,
-} from '@remix-run/react';
+} from "@remix-run/react";
 
 export function meta() {
   return {
@@ -40,29 +40,29 @@ function Layout({ children }) {
           alignItems: "center",
         }}
       >
-      {children}
-      <footer>
-        <ul style={{ display: "flex", listStyleType: "none", padding: 0 }}>
-          <li style={{ margin: 4 }}>
-            <a
-              target="_blank"
-              rel="noopener noreferrer"
-              href="https://github.com/arpitdalal/remix-supabase-auth"
-            >
-              Github
-            </a>
-          </li>
-          <li style={{ margin: 4 }}>
-            <a
-              target="_blank"
-              rel="noopener noreferrer"
-              href="https://twitter.com/_arpit_dalal_"
-            >
-              Twitter
-            </a>
-          </li>
-        </ul>
-      </footer>
+        {children}
+        <footer>
+          <ul style={{ display: "flex", listStyleType: "none", padding: 0 }}>
+            <li style={{ margin: 4 }}>
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://github.com/westbrookc16/budget-management-remix"
+              >
+                Github
+              </a>
+            </li>
+            <li style={{ margin: 4 }}>
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://twitter.com/_arpit_dalal_"
+              >
+                Twitter
+              </a>
+            </li>
+          </ul>
+        </footer>
       </div>
     </div>
   );
@@ -80,9 +80,9 @@ export default function App() {
         <Links />
       </head>
       <body style={{ margin: 0 }}>
-          <Layout>
-            <Outlet />
-          </Layout>
+        <Layout>
+          <Outlet />
+        </Layout>
         <ScrollRestoration />
         <script
           dangerouslySetInnerHTML={{
