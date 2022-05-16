@@ -1,4 +1,4 @@
-import { supabaseClient } from '~/services/supabase.client';
+import { supabaseClient } from "../services/supabase.client";
 
 export const continueWithProvider = async ({
   provider,

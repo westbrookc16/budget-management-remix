@@ -9,8 +9,8 @@ import {
 import { supabaseAdmin } from "~/services/supabase.server";
 import { getUserByAccessToken } from "~/api/supabase-auth.server";
 import { getAccessToken } from "~/policies/authenticated.server";
-import authenticated from "~/policies/authenticated.server";
-import useUser from "~/hooks/useUser";
+import authenticated from "../../../../policies/authenticated.server";
+import useUser from "../../../../hooks/useUser";
 export async function action({ request }) {
   return authenticated(
     request,

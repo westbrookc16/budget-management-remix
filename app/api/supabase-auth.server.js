@@ -1,13 +1,11 @@
-import { supabaseAdmin } from '~/services/supabase.server';
+import { supabaseAdmin } from "../services/supabase.server";
 
 export async function setSBAuth(session) {
   const userAccessToken = session.get("access_token");
   supabaseAdmin.auth.setAuth(userAccessToken);
 }
 
-export function setAuthSession(session,
-  accessToken,
-  refreshToken) {
+export function setAuthSession(session, accessToken, refreshToken) {
   session.set("access_token", accessToken);
   session.set("refresh_token", refreshToken);
 
@@ -24,15 +22,13 @@ function hasAuthSession(session) {
 
 export async function hasActiveAuthSession(session) {
   try {
-    if (!(hasAuthSession(session)))
-      return false;
+    if (!hasAuthSession(session)) return false;
 
     const { user, error } = await getUserByAccessToken(
       session.get("access_token")
     );
 
-    if (error || !user)
-      return false;
+    if (error || !user) return false;
     return true;
   } catch {
     return false;
@@ -58,16 +54,17 @@ export async function refreshUserToken(session) {
   }
 }
 
-export async function loginUser({
-  email, password,
-}) {
+export async function loginUser({ email, password }) {
   try {
-    const { data: sessionData, error: loginError } = await supabaseAdmin.auth.api.signInWithEmail(email, password);
+    const { data: sessionData, error: loginError } =
+      await supabaseAdmin.auth.api.signInWithEmail(email, password);
 
-    if (loginError ||
+    if (
+      loginError ||
       !sessionData ||
       !sessionData.access_token ||
-      !sessionData.refresh_token) {
+      !sessionData.refresh_token
+    ) {
       return { error: loginError?.message || "Something went wrong" };
     }
 
@@ -80,9 +77,7 @@ export async function loginUser({
   }
 }
 
-export async function registerUser({
-  email, password,
-}) {
+export async function registerUser({ email, password }) {
   try {
     const { user, error: signUpError } = await supabaseAdmin.auth.signUp({
       email,

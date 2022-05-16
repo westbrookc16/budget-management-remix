@@ -1,6 +1,6 @@
-import { useCallback } from 'react';
+import { useCallback } from "react";
 
-import { continueWithProvider } from '~/api/supabase-auth.client';
+import { continueWithProvider } from "../api/supabase-auth.client";
 
 export default function AuthProviderBtn({ provider, redirectTo, ...props }) {
   const handleOnClick = useCallback(async () => {
@@ -20,4 +20,3 @@ export default function AuthProviderBtn({ provider, redirectTo, ...props }) {
     </button>
   );
 }
-
