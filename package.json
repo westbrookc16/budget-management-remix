@@ -5,8 +5,10 @@
   "license": "",
   "sideEffects": false,
   "scripts": {
-    "build": "remix build",
-    "dev": "remix dev"
+    "build": "npm run build:css && remix build",
+    "build:css": "tailwindcss -m -i ./styles/app.css -o app/styles/app.css",
+    "dev": "concurrently \"npm run dev:css\" \"remix dev\"",
+    "dev:css": "tailwind -w -i ./styles/app.css -o app/styles/app.css"
   },
   "dependencies": {
     "@remix-run/node": "^1.4.3",
@@ -21,7 +23,11 @@
     "@remix-run/dev": "^1.4.3",
     "@remix-run/eslint-config": "^1.4.3",
     "@remix-run/serve": "^1.4.3",
-    "eslint": "^8.15.0"
+    "autoprefixer": "^10.4.7",
+    "concurrently": "^7.2.0",
+    "eslint": "^8.15.0",
+    "postcss": "^8.4.13",
+    "tailwindcss": "^3.0.24"
   },
   "engines": {
     "node": ">=14"

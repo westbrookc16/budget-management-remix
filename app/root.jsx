@@ -11,12 +11,18 @@ import {
   useLoaderData,
 } from "@remix-run/react";
 
+import styles from "./styles/app.css";
+
 export function meta() {
   return {
     title: "Budget Management",
     description:
       "Bare minimum and un-opinionated example using Remix to implement Supabase's email/password and social auth",
   };
+}
+
+export function links() {
+  return [{ rel: "stylesheet", href: styles }];
 }
 
 export function loader() {
@@ -30,20 +36,12 @@ export function loader() {
 
 function Layout({ children }) {
   return (
-    <div style={{ padding: "0 20px" }}>
-      <div
-        style={{
-          height: "100vh",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-          alignItems: "center",
-        }}
-      >
+    <div className="px-5">
+      <div className="h-screen flex flex-col justify-between items-center">
         {children}
         <footer>
-          <ul style={{ display: "flex", listStyleType: "none", padding: 0 }}>
-            <li style={{ margin: 4 }}>
+          <ul className="flex list-none p-0 gap-1">
+            <li>
               <a
                 target="_blank"
                 rel="noopener noreferrer"
@@ -52,7 +50,7 @@ function Layout({ children }) {
                 Github
               </a>
             </li>
-            <li style={{ margin: 4 }}>
+            <li>
               <a
                 target="_blank"
                 rel="noopener noreferrer"
