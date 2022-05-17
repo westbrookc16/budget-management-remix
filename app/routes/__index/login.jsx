@@ -16,7 +16,9 @@ export async function loader({ request }) {
   return authenticated(
     request,
     () => {
-      return redirect("/profile");
+      return redirect(
+        `/budget/${new Date().getMonth + 1}/${new Date().getFullYear()}`
+      );
     },
     () => {
       return json({});
