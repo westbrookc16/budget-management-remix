@@ -24,12 +24,7 @@ export default function BudgetManagementLayout() {
           <li style={{ margin: 4 }}>
             <Link to="/">Home</Link>
           </li>
-          <li style={{ margin: 4 }}>
-            <Link to="/profile">Profile</Link>
-          </li>
-          <li style={{ margin: 4 }}>
-            <Link to="/settings">Settings</Link>
-          </li>
+
           <li style={{ margin: 4 }}>
             <Link
               to={`/budget/${
