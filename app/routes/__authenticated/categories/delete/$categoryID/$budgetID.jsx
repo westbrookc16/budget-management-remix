@@ -18,7 +18,6 @@ export function action({ request, params }) {
       const data = await request.formData();
       const _action = data.get("_action");
       if (_action === "delete") {
-        console.log("delete");
         const { error } = await supabaseAdmin
           .from("categories")
           .delete()
@@ -39,7 +38,10 @@ export default function DeleteCategory() {
   const { name } = category;
   return (
     <div>
-      <h1>Are you sure you want to delete {name}"</h1>
+      <h1>
+        <div role="alert">Are you sure you want to delete {name}"</div>
+      </h1>
+
       <Form method="post">
         <button type="submit" name="_action" value="delete">
           Delete

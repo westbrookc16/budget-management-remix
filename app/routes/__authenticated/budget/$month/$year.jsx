@@ -2,6 +2,7 @@ import { json, redirect } from "@remix-run/node";
 
 import {
   Form,
+  useActionData,
   useLoaderData,
   useSearchParams,
   useTransition,
@@ -30,7 +31,6 @@ export async function action({ request }) {
       const year = data.get("year");
       console.log(`year=${year}`);
       if (_action === "select") {
-        console.log(`select`);
         return redirect(`/budget/${month}/${year}`);
       }
       supabaseAdmin.auth.setAuth(await getAccessToken(request));
@@ -42,11 +42,21 @@ export async function action({ request }) {
           user_id,
           income,
         });
-        console.log(`insertError=${error}`);
+        if (error) {
+          return json({ error: error.message });
+        }
+        return json({ success: "Row Inserted Successfully." });
       } else {
-        console.log("update");
         supabaseAdmin.auth.setAuth(await getAccessToken(request));
-        await supabaseAdmin.from("budgets").update({ income }).match({ id });
+        const { error } = await supabaseAdmin
+          .from("budgets")
+          .update({ income })
+          .match({ id });
+
+        if (error) {
+          return json({ error: error.message });
+        }
+        return json({ success: "Row Inserted Successfully." });
       }
       return null;
     },
@@ -60,19 +70,10 @@ export async function loader({ request, params }) {
   let { month, year } = params;
 
   if (month === null) {
-    //get data from form
     console.log("bad error.");
     return null;
   }
 
-  /*if (month === null || year === null) {
-    return redirect(
-      `/budget?month=${
-        new Date().getMonth() + 1
-      }&year=${new Date().getFullYear()}`
-    );
-  }*/
-  //get user id
   const accessToken = await getAccessToken(request);
 
   supabaseAdmin.auth.setAuth(accessToken);
@@ -80,8 +81,7 @@ export async function loader({ request, params }) {
     .from("budgets")
     .select()
     .match({ month, year });
-  console.log(data);
-  console.log(`selectError=${JSON.stringify(error, null, 2)}`);
+
   if (!data || data?.length === 0) {
     return json({ id: -1, month, year, income: 0, user_id: "" });
   } else {
@@ -93,6 +93,7 @@ export async function loader({ request, params }) {
 export default function Budget() {
   const transition = useTransition();
   const { income, id, user_id, month, year } = useLoaderData();
+  const actionData = useActionData();
   const [incomeTxt, setIncomeTxt] = useState("");
   useEffect(() => {
     setIncomeTxt(income);
@@ -159,6 +160,10 @@ export default function Budget() {
       </Form>
 
       {id > 0 && <a href={`/categories/${id}`}>View/Edit Categories</a>}
+      {actionData?.success && (
+        <div role="alert">Budget Updated Successfully.</div>
+      )}
+      {actionData?.error && <div role="alert">An error occurred: {error}</div>}
     </div>
   );
 }

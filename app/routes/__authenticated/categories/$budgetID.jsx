@@ -1,4 +1,5 @@
 import { useLoaderData, useTransition } from "@remix-run/react";
+import { formatCurrency } from "~/utils/currency";
 import { Form } from "@remix-run/react";
 import { getAccessToken } from "~/policies/authenticated.server";
 import authenticated from "~/policies/authenticated.server";
@@ -36,24 +37,28 @@ export async function action({ request, params }) {
 export async function loader({ request, params }) {
   supabaseAdmin.auth.setAuth(await getAccessToken(request));
   const { budgetID } = params;
-  console.log(`budgetID=${budgetID}`);
-  let { data } = await supabaseAdmin
+
+  let { data: categories } = await supabaseAdmin
     .from("categories")
     .select()
     .match({ budget_id: budgetID });
-  const categories = data;
+  const totalBudgeted = categories.reduce((p, c) => {
+    return (
+      parseFloat(p) + parseFloat(c.amount.replace("$", "").replace(",", ""))
+    );
+  }, 0);
   let { data: budget, error } = await supabaseAdmin
     .from("budgets")
     .select()
     .match({ id: budgetID })
     .limit(1)
     .single();
-  console.log(error);
-  return json({ budget, categories });
+
+  return json({ budget, categories, totalBudgeted });
 }
 export default function Categories() {
-  const { budget, categories } = useLoaderData();
-  const { month, year } = budget;
+  const { budget, categories, totalBudgeted } = useLoaderData();
+  const { month, year, income } = budget;
   const transition = useTransition();
   const trs = categories.map((cat) => {
     const { name, amount, id } = cat;
@@ -80,7 +85,6 @@ export default function Categories() {
     );
   });
 
-  console.log(`${month}/${year}`);
   return (
     <div>
       <h1>{`Categories for ${month}/${year}`}</h1>
@@ -102,6 +106,16 @@ export default function Categories() {
           Add
         </button>
       </Form>
+      Total income: {income}
+      <br />
+      Total Budgeted: {formatCurrency(totalBudgeted)}
+      <div aria-live="polite">
+        There is{" "}
+        {formatCurrency(
+          parseFloat(income.replace("$", "").replace(",", "")) - totalBudgeted
+        )}{" "}
+        left to budget.
+      </div>
     </div>
   );
 }
