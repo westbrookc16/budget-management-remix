@@ -5,6 +5,7 @@ import {
   useActionData,
   useLoaderData,
   useSearchParams,
+  useSubmit,
   useTransition,
 } from "@remix-run/react";
 
@@ -30,7 +31,7 @@ export async function action({ request }) {
       const month = data.get("month");
       const year = data.get("year");
       console.log(`year=${year}`);
-      if (_action === "select") {
+      if (_action === "Select") {
         return redirect(`/budget/${month}/${year}`);
       }
       supabaseAdmin.auth.setAuth(await getAccessToken(request));
@@ -99,12 +100,27 @@ export default function Budget() {
     setIncomeTxt(income);
   }, [income]);
   //const id = searchParams.get("id");
-
+  const submit = useSubmit();
+  const handleSelection = (e) => {
+    submit(
+      {
+        _action: "Select",
+        month: document.getElementById("month").value,
+        year: document.getElementById("year").value,
+      },
+      { method: "post" }
+    );
+  };
   return (
     <div>
       <Form method="post">
         <label htmlFor="month">Month</label>
-        <select defaultValue={month} id="month" name="month">
+        <select
+          defaultValue={month}
+          id="month"
+          name="month"
+          onChange={handleSelection}
+        >
           <option value="1">Jan</option>
           <option value="2">Feb</option>
           <option value="3">Mar</option>
@@ -121,19 +137,15 @@ export default function Budget() {
         <br />
         <label htmlFor="year">Year</label>
 
-        <select id="year" name="year" defaultValue={year}>
+        <select
+          id="year"
+          name="year"
+          defaultValue={year}
+          onChange={handleSelection}
+        >
           <option>2022</option>
           <option>2023</option>
         </select>
-        <button
-          type="submit"
-          name="_action"
-          value="select"
-          aria-live="polite"
-          disabled={transition.state !== "idle"}
-        >
-          Select
-        </button>
 
         <input type="hidden" name="id" value={id} />
         <label htmlFor="income">Income</label>
@@ -141,7 +153,7 @@ export default function Budget() {
           id="income"
           type="text"
           name="income"
-          readonly={transition.state !== "idle"}
+          readOnly={transition.state !== "idle"}
           value={incomeTxt}
           onChange={(e) => {
             e.preventDefault();

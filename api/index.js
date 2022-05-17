@@ -544,7 +544,8 @@ var budgetID_exports2 = {};
 __export(budgetID_exports2, {
   action: () => action3,
   default: () => Categories,
-  loader: () => loader4
+  loader: () => loader4,
+  meta: () => meta2
 });
 init_react();
 var import_react8 = require("@remix-run/react");
@@ -562,6 +563,9 @@ function formatCurrency(num) {
 // route:c:\dev\budget-management-remix\app\routes\__authenticated\categories\$budgetID.jsx
 var import_react9 = require("@remix-run/react");
 var import_node7 = require("@remix-run/node");
+function meta2() {
+  return { title: "Budget Management|Categories" };
+}
 async function action3({ request, params }) {
   return authenticated(request, async (user) => {
     const { budgetID } = params;
@@ -600,7 +604,7 @@ function Categories() {
   const transition = (0, import_react8.useTransition)();
   const trs = categories.map((cat) => {
     const { name: name2, amount, id } = cat;
-    return /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("li", {
+    return /* @__PURE__ */ React.createElement("li", {
       key: id
     }, /* @__PURE__ */ React.createElement(import_react9.Form, {
       method: "post"
@@ -620,7 +624,7 @@ function Categories() {
       id: "id",
       name: "id",
       value: id
-    }))));
+    })));
   });
   return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h1", null, `Categories for ${month}/${year}`), (categories == null ? void 0 : categories.length) > 0 && /* @__PURE__ */ React.createElement("ul", null, trs), /* @__PURE__ */ React.createElement("h2", null, "add New Category"), /* @__PURE__ */ React.createElement(import_react9.Form, {
     method: "post"
@@ -643,8 +647,11 @@ function Categories() {
     "aria-live": "polite",
     disabled: transition.type !== "idle"
   }, "Add")), "Total income: ", income, /* @__PURE__ */ React.createElement("br", null), "Total Budgeted: ", formatCurrency(totalBudgeted), /* @__PURE__ */ React.createElement("div", {
-    "aria-live": "polite"
-  }, "There is", " ", formatCurrency(parseFloat(income.replace("$", "").replace(",", "")) - totalBudgeted), " ", "left to budget."));
+    "aria-live": "polite",
+    role: "alert"
+  }, "There is", formatCurrency(parseFloat(income.replace("$", "").replace(",", "")) - totalBudgeted), " ", "left to budget."), /* @__PURE__ */ React.createElement(import_react8.Link, {
+    to: `/budget/${budget.month}/${budget.year}`
+  }, "Back To Budget Management"));
 }
 
 // route:c:\dev\budget-management-remix\app\routes\__authenticated\budget\$month\$year.jsx
@@ -653,13 +660,13 @@ __export(year_exports, {
   action: () => action4,
   default: () => Budget,
   loader: () => loader5,
-  meta: () => meta2
+  meta: () => meta3
 });
 init_react();
 var import_node8 = require("@remix-run/node");
 var import_react10 = require("@remix-run/react");
 var import_react11 = require("react");
-function meta2() {
+function meta3() {
   return { title: "Budget Management|Main Console" };
 }
 async function action4({ request }) {
@@ -672,7 +679,7 @@ async function action4({ request }) {
     const month = data.get("month");
     const year = data.get("year");
     console.log(`year=${year}`);
-    if (_action === "select") {
+    if (_action === "Select") {
       return (0, import_node8.redirect)(`/budget/${month}/${year}`);
     }
     supabaseAdmin.auth.setAuth(await getAccessToken(request));
@@ -724,6 +731,14 @@ function Budget() {
   (0, import_react11.useEffect)(() => {
     setIncomeTxt(income);
   }, [income]);
+  const submit = (0, import_react10.useSubmit)();
+  const handleSelection = (e) => {
+    submit({
+      _action: "Select",
+      month: document.getElementById("month").value,
+      year: document.getElementById("year").value
+    }, { method: "post" });
+  };
   return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement(import_react10.Form, {
     method: "post"
   }, /* @__PURE__ */ React.createElement("label", {
@@ -731,7 +746,8 @@ function Budget() {
   }, "Month"), /* @__PURE__ */ React.createElement("select", {
     defaultValue: month,
     id: "month",
-    name: "month"
+    name: "month",
+    onChange: handleSelection
   }, /* @__PURE__ */ React.createElement("option", {
     value: "1"
   }, "Jan"), /* @__PURE__ */ React.createElement("option", {
@@ -761,14 +777,9 @@ function Budget() {
   }, "Year"), /* @__PURE__ */ React.createElement("select", {
     id: "year",
     name: "year",
-    defaultValue: year
-  }, /* @__PURE__ */ React.createElement("option", null, "2022"), /* @__PURE__ */ React.createElement("option", null, "2023")), /* @__PURE__ */ React.createElement("button", {
-    type: "submit",
-    name: "_action",
-    value: "select",
-    "aria-live": "polite",
-    disabled: transition.state !== "idle"
-  }, "Select"), /* @__PURE__ */ React.createElement("input", {
+    defaultValue: year,
+    onChange: handleSelection
+  }, /* @__PURE__ */ React.createElement("option", null, "2022"), /* @__PURE__ */ React.createElement("option", null, "2023")), /* @__PURE__ */ React.createElement("input", {
     type: "hidden",
     name: "id",
     value: id
@@ -778,7 +789,7 @@ function Budget() {
     id: "income",
     type: "text",
     name: "income",
-    readonly: transition.state !== "idle",
+    readOnly: transition.state !== "idle",
     value: incomeTxt,
     onChange: (e) => {
       e.preventDefault();
@@ -806,7 +817,7 @@ function Budget() {
 var profile_exports = {};
 __export(profile_exports, {
   default: () => Profile,
-  meta: () => meta3
+  meta: () => meta4
 });
 init_react();
 
@@ -827,7 +838,7 @@ function useUser() {
 
 // route:c:\dev\budget-management-remix\app\routes\__authenticated\profile.jsx
 var import_react13 = require("@remix-run/react");
-function meta3() {
+function meta4() {
   return { title: "Supabase x Remix | Profile" };
 }
 function Profile() {
@@ -920,7 +931,7 @@ __export(register_exports, {
   action: () => action6,
   default: () => Register,
   loader: () => loader8,
-  meta: () => meta4
+  meta: () => meta5
 });
 init_react();
 var import_react16 = require("@remix-run/react");
@@ -946,7 +957,7 @@ function AuthProviderBtn(_a) {
 }
 
 // route:c:\dev\budget-management-remix\app\routes\__index\register.jsx
-function meta4() {
+function meta5() {
   return { title: "Budget Management| Register" };
 }
 async function loader8({ request }) {
@@ -1020,10 +1031,10 @@ function Register() {
 var index_exports2 = {};
 __export(index_exports2, {
   default: () => Index,
-  meta: () => meta5
+  meta: () => meta6
 });
 init_react();
-function meta5() {
+function meta6() {
   return { title: "Budget Management| Home" };
 }
 function Index() {
@@ -1038,13 +1049,13 @@ __export(login_exports, {
   action: () => action7,
   default: () => Login,
   loader: () => loader9,
-  meta: () => meta6
+  meta: () => meta7
 });
 init_react();
 var import_react17 = require("react");
 var import_node12 = require("@remix-run/node");
 var import_react18 = require("@remix-run/react");
-function meta6() {
+function meta7() {
   return { title: "Budget Management| Login" };
 }
 async function loader9({ request }) {
@@ -1126,7 +1137,7 @@ function Login() {
 
 // server-assets-manifest:@remix-run/dev/assets-manifest
 init_react();
-var assets_manifest_default = { "version": "05fba757", "entry": { "module": "/build/entry.client-LZFJR6E4.js", "imports": ["/build/_shared/chunk-WYYCUXJ7.js", "/build/_shared/chunk-FN7GJDOI.js"] }, "routes": { "root": { "id": "root", "parentId": void 0, "path": "", "index": void 0, "caseSensitive": void 0, "module": "/build/root-TC3UTORZ.js", "imports": void 0, "hasAction": false, "hasLoader": true, "hasCatchBoundary": true, "hasErrorBoundary": true }, "routes/__authenticated": { "id": "routes/__authenticated", "parentId": "root", "path": void 0, "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__authenticated-VNNNKUL4.js", "imports": ["/build/_shared/chunk-EWMPTY72.js"], "hasAction": false, "hasLoader": true, "hasCatchBoundary": true, "hasErrorBoundary": false }, "routes/__authenticated/budget/$month/$year": { "id": "routes/__authenticated/budget/$month/$year", "parentId": "routes/__authenticated", "path": "budget/:month/:year", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__authenticated/budget/$month/$year-2XU52DAZ.js", "imports": ["/build/_shared/chunk-FO2FZAZ4.js"], "hasAction": true, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__authenticated/categories/$budgetID": { "id": "routes/__authenticated/categories/$budgetID", "parentId": "routes/__authenticated", "path": "categories/:budgetID", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__authenticated/categories/$budgetID-FSFEGZER.js", "imports": void 0, "hasAction": true, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__authenticated/categories/delete/$categoryID/$budgetID": { "id": "routes/__authenticated/categories/delete/$categoryID/$budgetID", "parentId": "routes/__authenticated", "path": "categories/delete/:categoryID/:budgetID", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__authenticated/categories/delete/$categoryID/$budgetID-AARCV5UE.js", "imports": void 0, "hasAction": true, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__authenticated/profile": { "id": "routes/__authenticated/profile", "parentId": "routes/__authenticated", "path": "profile", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__authenticated/profile-L4T43GGM.js", "imports": void 0, "hasAction": false, "hasLoader": false, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__index": { "id": "routes/__index", "parentId": "root", "path": void 0, "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__index-OKERVPQX.js", "imports": ["/build/_shared/chunk-J2TD3V3X.js", "/build/_shared/chunk-FO2FZAZ4.js"], "hasAction": false, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__index/index": { "id": "routes/__index/index", "parentId": "routes/__index", "path": void 0, "index": true, "caseSensitive": void 0, "module": "/build/routes/__index/index-EVBKKG2Q.js", "imports": void 0, "hasAction": false, "hasLoader": false, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__index/login": { "id": "routes/__index/login", "parentId": "routes/__index", "path": "login", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__index/login-SQTPRXFK.js", "imports": ["/build/_shared/chunk-PGVZMUP7.js", "/build/_shared/chunk-Y5AGIVAF.js", "/build/_shared/chunk-EWMPTY72.js"], "hasAction": true, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__index/register": { "id": "routes/__index/register", "parentId": "routes/__index", "path": "register", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__index/register-AR5GCFHY.js", "imports": ["/build/_shared/chunk-PGVZMUP7.js", "/build/_shared/chunk-Y5AGIVAF.js", "/build/_shared/chunk-EWMPTY72.js"], "hasAction": true, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/api/auth.callback": { "id": "routes/api/auth.callback", "parentId": "root", "path": "api/auth/callback", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/api/auth.callback-UVJCS6OI.js", "imports": ["/build/_shared/chunk-Y5AGIVAF.js", "/build/_shared/chunk-J2TD3V3X.js", "/build/_shared/chunk-FO2FZAZ4.js"], "hasAction": true, "hasLoader": false, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/api/logout": { "id": "routes/api/logout", "parentId": "root", "path": "api/logout", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/api/logout-M6GZIMZO.js", "imports": ["/build/_shared/chunk-J2TD3V3X.js", "/build/_shared/chunk-FO2FZAZ4.js"], "hasAction": true, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false } }, "url": "/build/manifest-05FBA757.js" };
+var assets_manifest_default = { "version": "063f017a", "entry": { "module": "/build/entry.client-BYM6EFLT.js", "imports": ["/build/_shared/chunk-3KBVUVEV.js", "/build/_shared/chunk-FN7GJDOI.js"] }, "routes": { "root": { "id": "root", "parentId": void 0, "path": "", "index": void 0, "caseSensitive": void 0, "module": "/build/root-KDJESD2N.js", "imports": void 0, "hasAction": false, "hasLoader": true, "hasCatchBoundary": true, "hasErrorBoundary": true }, "routes/__authenticated": { "id": "routes/__authenticated", "parentId": "root", "path": void 0, "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__authenticated-ZF6XDQOC.js", "imports": ["/build/_shared/chunk-EWMPTY72.js"], "hasAction": false, "hasLoader": true, "hasCatchBoundary": true, "hasErrorBoundary": false }, "routes/__authenticated/budget/$month/$year": { "id": "routes/__authenticated/budget/$month/$year", "parentId": "routes/__authenticated", "path": "budget/:month/:year", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__authenticated/budget/$month/$year-G2FBJFCW.js", "imports": ["/build/_shared/chunk-FO2FZAZ4.js"], "hasAction": true, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__authenticated/categories/$budgetID": { "id": "routes/__authenticated/categories/$budgetID", "parentId": "routes/__authenticated", "path": "categories/:budgetID", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__authenticated/categories/$budgetID-4TNU6LLK.js", "imports": void 0, "hasAction": true, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__authenticated/categories/delete/$categoryID/$budgetID": { "id": "routes/__authenticated/categories/delete/$categoryID/$budgetID", "parentId": "routes/__authenticated", "path": "categories/delete/:categoryID/:budgetID", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__authenticated/categories/delete/$categoryID/$budgetID-PMI5TRE6.js", "imports": void 0, "hasAction": true, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__authenticated/profile": { "id": "routes/__authenticated/profile", "parentId": "routes/__authenticated", "path": "profile", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__authenticated/profile-Y7R2MRSE.js", "imports": void 0, "hasAction": false, "hasLoader": false, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__index": { "id": "routes/__index", "parentId": "root", "path": void 0, "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__index-S4WCJDOM.js", "imports": ["/build/_shared/chunk-J2TD3V3X.js", "/build/_shared/chunk-FO2FZAZ4.js"], "hasAction": false, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__index/index": { "id": "routes/__index/index", "parentId": "routes/__index", "path": void 0, "index": true, "caseSensitive": void 0, "module": "/build/routes/__index/index-EVBKKG2Q.js", "imports": void 0, "hasAction": false, "hasLoader": false, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__index/login": { "id": "routes/__index/login", "parentId": "routes/__index", "path": "login", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__index/login-UWZPI5NG.js", "imports": ["/build/_shared/chunk-PGVZMUP7.js", "/build/_shared/chunk-Y5AGIVAF.js", "/build/_shared/chunk-EWMPTY72.js"], "hasAction": true, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__index/register": { "id": "routes/__index/register", "parentId": "routes/__index", "path": "register", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__index/register-QHRQPOMI.js", "imports": ["/build/_shared/chunk-PGVZMUP7.js", "/build/_shared/chunk-Y5AGIVAF.js", "/build/_shared/chunk-EWMPTY72.js"], "hasAction": true, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/api/auth.callback": { "id": "routes/api/auth.callback", "parentId": "root", "path": "api/auth/callback", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/api/auth.callback-3KKF7YE5.js", "imports": ["/build/_shared/chunk-Y5AGIVAF.js", "/build/_shared/chunk-J2TD3V3X.js", "/build/_shared/chunk-FO2FZAZ4.js"], "hasAction": true, "hasLoader": false, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/api/logout": { "id": "routes/api/logout", "parentId": "root", "path": "api/logout", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/api/logout-M6GZIMZO.js", "imports": ["/build/_shared/chunk-J2TD3V3X.js", "/build/_shared/chunk-FO2FZAZ4.js"], "hasAction": true, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false } }, "url": "/build/manifest-063F017A.js" };
 
 // server-entry-module:@remix-run/dev/server-build
 var entry = { module: entry_server_exports };

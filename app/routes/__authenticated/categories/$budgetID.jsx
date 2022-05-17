@@ -1,11 +1,13 @@
-import { useLoaderData, useTransition } from "@remix-run/react";
+import { Link, useLoaderData, useTransition } from "@remix-run/react";
 import { formatCurrency } from "~/utils/currency";
 import { Form } from "@remix-run/react";
 import { getAccessToken } from "~/policies/authenticated.server";
 import authenticated from "~/policies/authenticated.server";
 import { supabaseAdmin } from "../../../services/supabase.server";
 import { json, redirect } from "@remix-run/node";
-
+export function meta() {
+  return { title: "Budget Management|Categories" };
+}
 export async function action({ request, params }) {
   return authenticated(
     request,
@@ -63,25 +65,23 @@ export default function Categories() {
   const trs = categories.map((cat) => {
     const { name, amount, id } = cat;
     return (
-      <>
-        <li key={id}>
-          <Form method="post">
-            <label>
-              {name}
+      <li key={id}>
+        <Form method="post">
+          <label>
+            {name}
 
-              <input aria-label={name} defaultValue={amount} name="amount" />
-            </label>
+            <input aria-label={name} defaultValue={amount} name="amount" />
+          </label>
 
-            <button type="submit" name="_action" value="update">
-              Update
-            </button>
-            <button name="_action" value="delete">
-              Delete
-            </button>
-            <input type="hidden" id="id" name="id" value={id} />
-          </Form>
-        </li>
-      </>
+          <button type="submit" name="_action" value="update">
+            Update
+          </button>
+          <button name="_action" value="delete">
+            Delete
+          </button>
+          <input type="hidden" id="id" name="id" value={id} />
+        </Form>
+      </li>
     );
   });
 
@@ -109,13 +109,16 @@ export default function Categories() {
       Total income: {income}
       <br />
       Total Budgeted: {formatCurrency(totalBudgeted)}
-      <div aria-live="polite">
-        There is{" "}
+      <div aria-live="polite" role="alert">
+        There is
         {formatCurrency(
           parseFloat(income.replace("$", "").replace(",", "")) - totalBudgeted
         )}{" "}
         left to budget.
       </div>
+      <Link to={`/budget/${budget.month}/${budget.year}`}>
+        Back To Budget Management
+      </Link>
     </div>
   );
 }
