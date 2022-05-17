@@ -17,7 +17,7 @@ export async function loader({ request }) {
     request,
     () => {
       return redirect(
-        `/budget/${new Date().getMonth + 1}/${new Date().getFullYear()}`
+        `/budget/${new Date().getMonth() + 1}/${new Date().getFullYear()}`
       );
     },
     () => {
