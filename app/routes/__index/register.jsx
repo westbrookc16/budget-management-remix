@@ -13,7 +13,9 @@ export async function loader({ request }) {
   return authenticated(
     request,
     () => {
-      return redirect("/profile");
+      return redirect(
+        `/budget/${new Date().getMonth() + 1}/${new Date().getFullYear()}`
+      );
     },
     () => {
       return json({});
@@ -64,7 +66,12 @@ export default function Register() {
     <div>
       <h1>Register</h1>
       <div style={{ margin: 5 }}>
-        <AuthProviderBtn provider="google" />
+        <AuthProviderBtn
+          provider="google"
+          redirectTo={`/budget/${
+            new Date().getMonth() + 1
+          }/${new Date().getFullYear()}`}
+        />
       </div>
       <div style={{ margin: 5 }}>
         <AuthProviderBtn provider="facebook" />

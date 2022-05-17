@@ -163,7 +163,9 @@ export default function Budget() {
       {actionData?.success && (
         <div role="alert">Budget Updated Successfully.</div>
       )}
-      {actionData?.error && <div role="alert">An error occurred: {error}</div>}
+      {actionData?.error && (
+        <div role="alert">An error occurred: {actionData?.error}</div>
+      )}
     </div>
   );
 }

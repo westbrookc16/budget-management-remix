@@ -205,8 +205,8 @@ function CatchBoundary() {
   }
   return /* @__PURE__ */ React.createElement(Layout, null, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h1", null, "Caught"), /* @__PURE__ */ React.createElement("p", null, "Status: ", caught.status), /* @__PURE__ */ React.createElement("pre", null, /* @__PURE__ */ React.createElement("code", null, JSON.stringify(caught.data, null, 2)))));
 }
-function ErrorBoundary({ error: error2 }) {
-  return /* @__PURE__ */ React.createElement(Layout, null, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h1", null, "Error"), /* @__PURE__ */ React.createElement("p", null, error2.message), /* @__PURE__ */ React.createElement("p", null, "The stack trace is:"), /* @__PURE__ */ React.createElement("pre", null, error2.stack)));
+function ErrorBoundary({ error }) {
+  return /* @__PURE__ */ React.createElement(Layout, null, /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h1", null, "Error"), /* @__PURE__ */ React.createElement("p", null, error.message), /* @__PURE__ */ React.createElement("p", null, "The stack trace is:"), /* @__PURE__ */ React.createElement("pre", null, error.stack)));
 }
 
 // route:c:\dev\budget-management-remix\app\routes\api\auth.callback.jsx
@@ -278,8 +278,8 @@ async function hasActiveAuthSession(session) {
   try {
     if (!hasAuthSession(session))
       return false;
-    const { user, error: error2 } = await getUserByAccessToken(session.get("access_token"));
-    if (error2 || !user)
+    const { user, error } = await getUserByAccessToken(session.get("access_token"));
+    if (error || !user)
       return false;
     return true;
   } catch {
@@ -288,9 +288,9 @@ async function hasActiveAuthSession(session) {
 }
 async function refreshUserToken(session) {
   try {
-    const { data, error: error2 } = await supabaseAdmin.auth.api.refreshAccessToken(session.get("refresh_token"));
-    if (error2 || !data || !data.access_token || !data.refresh_token) {
-      return { error: (error2 == null ? void 0 : error2.message) || "Something went wrong" };
+    const { data, error } = await supabaseAdmin.auth.api.refreshAccessToken(session.get("refresh_token"));
+    if (error || !data || !data.access_token || !data.refresh_token) {
+      return { error: (error == null ? void 0 : error.message) || "Something went wrong" };
     }
     return {
       accessToken: data.access_token,
@@ -332,9 +332,9 @@ async function registerUser({ email, password }) {
 }
 async function signOutUser(session) {
   try {
-    const { error: error2 } = await supabaseAdmin.auth.api.signOut(session.get("access_token"));
-    if (error2) {
-      return { done: false, error: (error2 == null ? void 0 : error2.message) || "Something went wrong" };
+    const { error } = await supabaseAdmin.auth.api.signOut(session.get("access_token"));
+    if (error) {
+      return { done: false, error: (error == null ? void 0 : error.message) || "Something went wrong" };
     }
     return { done: true };
   } catch {
@@ -346,9 +346,9 @@ async function signOutUser(session) {
 }
 async function getUserByAccessToken(accessToken) {
   try {
-    const { user, error: error2 } = await supabaseAdmin.auth.api.getUser(accessToken);
-    if (error2 || !user) {
-      return { error: (error2 == null ? void 0 : error2.message) || "Something went wrong" };
+    const { user, error } = await supabaseAdmin.auth.api.getUser(accessToken);
+    if (error || !user) {
+      return { error: (error == null ? void 0 : error.message) || "Something went wrong" };
     }
     return { user };
   } catch {
@@ -418,9 +418,9 @@ async function authenticated(request, successFunction, failureFunction, redirect
     const redirectUrl = redirectTo || `${url.origin}${url.pathname}${url.search}`;
     const isActiveAuthSession = await hasActiveAuthSession(session);
     if (!isActiveAuthSession) {
-      const { accessToken, refreshToken, error: error2 } = await refreshUserToken(session);
-      if (error2 || !accessToken || !refreshToken) {
-        throw new Error("refreshUserToken " + error2);
+      const { accessToken, refreshToken, error } = await refreshUserToken(session);
+      if (error || !accessToken || !refreshToken) {
+        throw new Error("refreshUserToken " + error);
       }
       session = setAuthSession(session, accessToken, refreshToken);
       return (0, import_node4.redirect)(redirectUrl, {
@@ -435,8 +435,8 @@ async function authenticated(request, successFunction, failureFunction, redirect
     }
     const { data } = await supabaseAdmin.from("user_data").select().match({ user_id: user.id }).limit(1).single();
     return await successFunction(__spreadValues({ email: user.email }, data));
-  } catch (error2) {
-    console.log(error2);
+  } catch (error) {
+    console.log(error);
     return failureFunction();
   }
 }
@@ -512,7 +512,7 @@ function action2({ request, params }) {
     const data = await request.formData();
     const _action = data.get("_action");
     if (_action === "delete") {
-      const { error: error2 } = await supabaseAdmin.from("categories").delete().match({ id: params.categoryID });
+      const { error } = await supabaseAdmin.from("categories").delete().match({ id: params.categoryID });
       return (0, import_node6.redirect)(`/categories/${params.budgetID}`);
     } else {
       return (0, import_node6.redirect)(`/categories/${params.budgetID}`);
@@ -591,7 +591,7 @@ async function loader4({ request, params }) {
   const totalBudgeted = categories.reduce((p, c) => {
     return parseFloat(p) + parseFloat(c.amount.replace("$", "").replace(",", ""));
   }, 0);
-  let { data: budget, error: error2 } = await supabaseAdmin.from("budgets").select().match({ id: budgetID }).limit(1).single();
+  let { data: budget, error } = await supabaseAdmin.from("budgets").select().match({ id: budgetID }).limit(1).single();
   return (0, import_node7.json)({ budget, categories, totalBudgeted });
 }
 function Categories() {
@@ -678,21 +678,21 @@ async function action4({ request }) {
     supabaseAdmin.auth.setAuth(await getAccessToken(request));
     if (id === "-1") {
       console.log("insert");
-      const { error: error2 } = await supabaseAdmin.from("budgets").insert({
+      const { error } = await supabaseAdmin.from("budgets").insert({
         month,
         year,
         user_id,
         income
       });
-      if (error2) {
-        return (0, import_node8.json)({ error: error2.message });
+      if (error) {
+        return (0, import_node8.json)({ error: error.message });
       }
       return (0, import_node8.json)({ success: "Row Inserted Successfully." });
     } else {
       supabaseAdmin.auth.setAuth(await getAccessToken(request));
-      const { error: error2 } = await supabaseAdmin.from("budgets").update({ income }).match({ id });
-      if (error2) {
-        return (0, import_node8.json)({ error: error2.message });
+      const { error } = await supabaseAdmin.from("budgets").update({ income }).match({ id });
+      if (error) {
+        return (0, import_node8.json)({ error: error.message });
       }
       return (0, import_node8.json)({ success: "Row Inserted Successfully." });
     }
@@ -709,7 +709,7 @@ async function loader5({ request, params }) {
   }
   const accessToken = await getAccessToken(request);
   supabaseAdmin.auth.setAuth(accessToken);
-  const { data, error: error2 } = await supabaseAdmin.from("budgets").select().match({ month, year });
+  const { data, error } = await supabaseAdmin.from("budgets").select().match({ month, year });
   if (!data || (data == null ? void 0 : data.length) === 0) {
     return (0, import_node8.json)({ id: -1, month, year, income: 0, user_id: "" });
   } else {
@@ -799,7 +799,7 @@ function Budget() {
     role: "alert"
   }, "Budget Updated Successfully."), (actionData == null ? void 0 : actionData.error) && /* @__PURE__ */ React.createElement("div", {
     role: "alert"
-  }, "An error occurred: ", error));
+  }, "An error occurred: ", actionData == null ? void 0 : actionData.error));
 }
 
 // route:c:\dev\budget-management-remix\app\routes\__authenticated\profile.jsx
@@ -861,9 +861,9 @@ async function action5({ request }) {
   if (!session) {
     return (0, import_node9.redirect)("/login");
   }
-  const { done, error: error2 } = await signOutUser(session);
-  if (error2 || !done) {
-    console.log("Error signing out user in supabase", error2);
+  const { done, error } = await signOutUser(session);
+  if (error || !done) {
+    console.log("Error signing out user in supabase", error);
   }
   return (0, import_node9.redirect)("/login", {
     headers: { "Set-Cookie": await authCookie.destroySession(session) }
@@ -935,8 +935,8 @@ function AuthProviderBtn(_a) {
   const handleOnClick = (0, import_react15.useCallback)(async () => {
     try {
       await (0, import_supabase_auth5.continueWithProvider)({ provider, redirectTo });
-    } catch (error2) {
-      console.log(`error in continue with ${provider}`, error2);
+    } catch (error) {
+      console.log(`error in continue with ${provider}`, error);
       return;
     }
   }, [provider, redirectTo]);
@@ -951,7 +951,7 @@ function meta4() {
 }
 async function loader8({ request }) {
   return authenticated(request, () => {
-    return (0, import_node11.redirect)("/profile");
+    return (0, import_node11.redirect)(`/budget/${new Date().getMonth() + 1}/${new Date().getFullYear()}`);
   }, () => {
     return (0, import_node11.json)({});
   });
@@ -968,12 +968,12 @@ async function action6({ request }) {
       }
     }, 403);
   }
-  const { user, error: error2 } = await registerUser({
+  const { user, error } = await registerUser({
     email,
     password
   });
-  if (error2 || !user) {
-    return (0, import_node11.json)({ formError: error2 || "Something went wrong", fields: { email } }, 401);
+  if (error || !user) {
+    return (0, import_node11.json)({ formError: error || "Something went wrong", fields: { email } }, 401);
   }
   return (0, import_node11.json)({ result: "success" }, { status: 201 });
 }
@@ -983,7 +983,8 @@ function Register() {
   return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h1", null, "Register"), /* @__PURE__ */ React.createElement("div", {
     style: { margin: 5 }
   }, /* @__PURE__ */ React.createElement(AuthProviderBtn, {
-    provider: "google"
+    provider: "google",
+    redirectTo: `/budget/${new Date().getMonth() + 1}/${new Date().getFullYear()}`
   })), /* @__PURE__ */ React.createElement("div", {
     style: { margin: 5 }
   }, /* @__PURE__ */ React.createElement(AuthProviderBtn, {
@@ -1067,12 +1068,12 @@ async function action7({ request }) {
       }
     }, 403);
   }
-  const { accessToken, refreshToken, error: error2 } = await loginUser({
+  const { accessToken, refreshToken, error } = await loginUser({
     email,
     password
   });
-  if (error2 || !accessToken || !refreshToken) {
-    return (0, import_node12.json)({ formError: error2 || "Something went wrong", fields: { email } }, 403);
+  if (error || !accessToken || !refreshToken) {
+    return (0, import_node12.json)({ formError: error || "Something went wrong", fields: { email } }, 403);
   }
   session = setAuthSession(session, accessToken, refreshToken);
   return (0, import_node12.redirect)(redirectTo, {
@@ -1125,7 +1126,7 @@ function Login() {
 
 // server-assets-manifest:@remix-run/dev/assets-manifest
 init_react();
-var assets_manifest_default = { "version": "ac8a58ad", "entry": { "module": "/build/entry.client-LZFJR6E4.js", "imports": ["/build/_shared/chunk-WYYCUXJ7.js", "/build/_shared/chunk-FN7GJDOI.js"] }, "routes": { "root": { "id": "root", "parentId": void 0, "path": "", "index": void 0, "caseSensitive": void 0, "module": "/build/root-TC3UTORZ.js", "imports": void 0, "hasAction": false, "hasLoader": true, "hasCatchBoundary": true, "hasErrorBoundary": true }, "routes/__authenticated": { "id": "routes/__authenticated", "parentId": "root", "path": void 0, "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__authenticated-VNNNKUL4.js", "imports": ["/build/_shared/chunk-EWMPTY72.js"], "hasAction": false, "hasLoader": true, "hasCatchBoundary": true, "hasErrorBoundary": false }, "routes/__authenticated/budget/$month/$year": { "id": "routes/__authenticated/budget/$month/$year", "parentId": "routes/__authenticated", "path": "budget/:month/:year", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__authenticated/budget/$month/$year-J2QP6TTZ.js", "imports": ["/build/_shared/chunk-FO2FZAZ4.js"], "hasAction": true, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__authenticated/categories/$budgetID": { "id": "routes/__authenticated/categories/$budgetID", "parentId": "routes/__authenticated", "path": "categories/:budgetID", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__authenticated/categories/$budgetID-FSFEGZER.js", "imports": void 0, "hasAction": true, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__authenticated/categories/delete/$categoryID/$budgetID": { "id": "routes/__authenticated/categories/delete/$categoryID/$budgetID", "parentId": "routes/__authenticated", "path": "categories/delete/:categoryID/:budgetID", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__authenticated/categories/delete/$categoryID/$budgetID-AARCV5UE.js", "imports": void 0, "hasAction": true, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__authenticated/profile": { "id": "routes/__authenticated/profile", "parentId": "routes/__authenticated", "path": "profile", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__authenticated/profile-L4T43GGM.js", "imports": void 0, "hasAction": false, "hasLoader": false, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__index": { "id": "routes/__index", "parentId": "root", "path": void 0, "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__index-OKERVPQX.js", "imports": ["/build/_shared/chunk-J2TD3V3X.js", "/build/_shared/chunk-FO2FZAZ4.js"], "hasAction": false, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__index/index": { "id": "routes/__index/index", "parentId": "routes/__index", "path": void 0, "index": true, "caseSensitive": void 0, "module": "/build/routes/__index/index-EVBKKG2Q.js", "imports": void 0, "hasAction": false, "hasLoader": false, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__index/login": { "id": "routes/__index/login", "parentId": "routes/__index", "path": "login", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__index/login-SQTPRXFK.js", "imports": ["/build/_shared/chunk-PGVZMUP7.js", "/build/_shared/chunk-Y5AGIVAF.js", "/build/_shared/chunk-EWMPTY72.js"], "hasAction": true, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__index/register": { "id": "routes/__index/register", "parentId": "routes/__index", "path": "register", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__index/register-62YA4XVQ.js", "imports": ["/build/_shared/chunk-PGVZMUP7.js", "/build/_shared/chunk-Y5AGIVAF.js", "/build/_shared/chunk-EWMPTY72.js"], "hasAction": true, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/api/auth.callback": { "id": "routes/api/auth.callback", "parentId": "root", "path": "api/auth/callback", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/api/auth.callback-UVJCS6OI.js", "imports": ["/build/_shared/chunk-Y5AGIVAF.js", "/build/_shared/chunk-J2TD3V3X.js", "/build/_shared/chunk-FO2FZAZ4.js"], "hasAction": true, "hasLoader": false, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/api/logout": { "id": "routes/api/logout", "parentId": "root", "path": "api/logout", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/api/logout-M6GZIMZO.js", "imports": ["/build/_shared/chunk-J2TD3V3X.js", "/build/_shared/chunk-FO2FZAZ4.js"], "hasAction": true, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false } }, "url": "/build/manifest-AC8A58AD.js" };
+var assets_manifest_default = { "version": "05fba757", "entry": { "module": "/build/entry.client-LZFJR6E4.js", "imports": ["/build/_shared/chunk-WYYCUXJ7.js", "/build/_shared/chunk-FN7GJDOI.js"] }, "routes": { "root": { "id": "root", "parentId": void 0, "path": "", "index": void 0, "caseSensitive": void 0, "module": "/build/root-TC3UTORZ.js", "imports": void 0, "hasAction": false, "hasLoader": true, "hasCatchBoundary": true, "hasErrorBoundary": true }, "routes/__authenticated": { "id": "routes/__authenticated", "parentId": "root", "path": void 0, "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__authenticated-VNNNKUL4.js", "imports": ["/build/_shared/chunk-EWMPTY72.js"], "hasAction": false, "hasLoader": true, "hasCatchBoundary": true, "hasErrorBoundary": false }, "routes/__authenticated/budget/$month/$year": { "id": "routes/__authenticated/budget/$month/$year", "parentId": "routes/__authenticated", "path": "budget/:month/:year", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__authenticated/budget/$month/$year-2XU52DAZ.js", "imports": ["/build/_shared/chunk-FO2FZAZ4.js"], "hasAction": true, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__authenticated/categories/$budgetID": { "id": "routes/__authenticated/categories/$budgetID", "parentId": "routes/__authenticated", "path": "categories/:budgetID", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__authenticated/categories/$budgetID-FSFEGZER.js", "imports": void 0, "hasAction": true, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__authenticated/categories/delete/$categoryID/$budgetID": { "id": "routes/__authenticated/categories/delete/$categoryID/$budgetID", "parentId": "routes/__authenticated", "path": "categories/delete/:categoryID/:budgetID", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__authenticated/categories/delete/$categoryID/$budgetID-AARCV5UE.js", "imports": void 0, "hasAction": true, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__authenticated/profile": { "id": "routes/__authenticated/profile", "parentId": "routes/__authenticated", "path": "profile", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__authenticated/profile-L4T43GGM.js", "imports": void 0, "hasAction": false, "hasLoader": false, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__index": { "id": "routes/__index", "parentId": "root", "path": void 0, "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__index-OKERVPQX.js", "imports": ["/build/_shared/chunk-J2TD3V3X.js", "/build/_shared/chunk-FO2FZAZ4.js"], "hasAction": false, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__index/index": { "id": "routes/__index/index", "parentId": "routes/__index", "path": void 0, "index": true, "caseSensitive": void 0, "module": "/build/routes/__index/index-EVBKKG2Q.js", "imports": void 0, "hasAction": false, "hasLoader": false, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__index/login": { "id": "routes/__index/login", "parentId": "routes/__index", "path": "login", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__index/login-SQTPRXFK.js", "imports": ["/build/_shared/chunk-PGVZMUP7.js", "/build/_shared/chunk-Y5AGIVAF.js", "/build/_shared/chunk-EWMPTY72.js"], "hasAction": true, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__index/register": { "id": "routes/__index/register", "parentId": "routes/__index", "path": "register", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__index/register-AR5GCFHY.js", "imports": ["/build/_shared/chunk-PGVZMUP7.js", "/build/_shared/chunk-Y5AGIVAF.js", "/build/_shared/chunk-EWMPTY72.js"], "hasAction": true, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/api/auth.callback": { "id": "routes/api/auth.callback", "parentId": "root", "path": "api/auth/callback", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/api/auth.callback-UVJCS6OI.js", "imports": ["/build/_shared/chunk-Y5AGIVAF.js", "/build/_shared/chunk-J2TD3V3X.js", "/build/_shared/chunk-FO2FZAZ4.js"], "hasAction": true, "hasLoader": false, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/api/logout": { "id": "routes/api/logout", "parentId": "root", "path": "api/logout", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/api/logout-M6GZIMZO.js", "imports": ["/build/_shared/chunk-J2TD3V3X.js", "/build/_shared/chunk-FO2FZAZ4.js"], "hasAction": true, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false } }, "url": "/build/manifest-05FBA757.js" };
 
 // server-entry-module:@remix-run/dev/server-build
 var entry = { module: entry_server_exports };
