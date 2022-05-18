@@ -132,7 +132,7 @@ var import_node = require("@remix-run/node");
 var import_react2 = require("@remix-run/react");
 
 // app/styles/app.css
-var app_default = "/build/_assets/app-FFHONF27.css";
+var app_default = "/build/_assets/app-3D23U3HB.css";
 
 // route:c:\dev\budget-management-remix\app\root.jsx
 function meta() {
@@ -595,29 +595,50 @@ function Categories() {
   const transition = (0, import_react8.useTransition)();
   const trs = categories.map((cat) => {
     const { name: name2, amount, id } = cat;
-    return /* @__PURE__ */ React.createElement("li", {
+    return /* @__PURE__ */ React.createElement("tr", {
       key: id
-    }, /* @__PURE__ */ React.createElement(import_react9.Form, {
-      method: "post"
-    }, /* @__PURE__ */ React.createElement("label", null, name2, /* @__PURE__ */ React.createElement("input", {
+    }, /* @__PURE__ */ React.createElement("td", {
+      scope: "row"
+    }, name2), /* @__PURE__ */ React.createElement("td", null, /* @__PURE__ */ React.createElement("input", {
+      form: `myForm-${id}`,
       "aria-label": name2,
       defaultValue: amount,
       name: "amount"
-    })), /* @__PURE__ */ React.createElement("button", {
+    })), /* @__PURE__ */ React.createElement("td", null, /* @__PURE__ */ React.createElement("button", {
+      form: `myForm-${id}`,
       type: "submit",
       name: "_action",
       value: "update"
-    }, "Update"), /* @__PURE__ */ React.createElement("button", {
+    }, "Update")), /* @__PURE__ */ React.createElement("td", null, /* @__PURE__ */ React.createElement("button", {
+      form: `myForm-${id}`,
       name: "_action",
       value: "delete"
-    }, "Delete"), /* @__PURE__ */ React.createElement("input", {
+    }, "Delete")), /* @__PURE__ */ React.createElement("td", null, /* @__PURE__ */ React.createElement("input", {
       type: "hidden",
       id: "id",
       name: "id",
-      value: id
+      value: id,
+      form: `myForm-${id}`
     })));
   });
-  return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h1", null, `Categories for ${month}/${year}`), (categories == null ? void 0 : categories.length) > 0 && /* @__PURE__ */ React.createElement("ul", null, trs), /* @__PURE__ */ React.createElement("h2", null, "add New Category"), /* @__PURE__ */ React.createElement(import_react9.Form, {
+  const forms = categories.map((cat) => {
+    const { id } = cat;
+    return /* @__PURE__ */ React.createElement(import_react9.Form, {
+      key: id,
+      id: `myForm-${id}`,
+      name: `myForm-${id}`,
+      method: "post"
+    });
+  });
+  return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h1", null, `Categories for ${month}/${year}`), (categories == null ? void 0 : categories.length) > 0 && /* @__PURE__ */ React.createElement("table", null, /* @__PURE__ */ React.createElement("thead", null, /* @__PURE__ */ React.createElement("tr", null, /* @__PURE__ */ React.createElement("th", {
+    scope: "col"
+  }, "Name"), /* @__PURE__ */ React.createElement("th", {
+    scope: "col"
+  }, "Amount"), /* @__PURE__ */ React.createElement("th", {
+    scope: "col"
+  }, "Update"), /* @__PURE__ */ React.createElement("th", {
+    scope: "col"
+  }, "Delete"))), /* @__PURE__ */ React.createElement("tbody", null, trs)), forms, /* @__PURE__ */ React.createElement("h2", null, "add New Category"), /* @__PURE__ */ React.createElement(import_react9.Form, {
     method: "post"
   }, /* @__PURE__ */ React.createElement("label", {
     htmlFor: "name"
@@ -1128,7 +1149,7 @@ function Login() {
 
 // server-assets-manifest:@remix-run/dev/assets-manifest
 init_react();
-var assets_manifest_default = { "version": "b8267e8f", "entry": { "module": "/build/entry.client-BYM6EFLT.js", "imports": ["/build/_shared/chunk-3KBVUVEV.js", "/build/_shared/chunk-FN7GJDOI.js"] }, "routes": { "root": { "id": "root", "parentId": void 0, "path": "", "index": void 0, "caseSensitive": void 0, "module": "/build/root-D7EKZETS.js", "imports": void 0, "hasAction": false, "hasLoader": true, "hasCatchBoundary": true, "hasErrorBoundary": true }, "routes/__authenticated": { "id": "routes/__authenticated", "parentId": "root", "path": void 0, "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__authenticated-42KQWPWI.js", "imports": ["/build/_shared/chunk-EWMPTY72.js"], "hasAction": false, "hasLoader": true, "hasCatchBoundary": true, "hasErrorBoundary": false }, "routes/__authenticated/budget/$month/$year": { "id": "routes/__authenticated/budget/$month/$year", "parentId": "routes/__authenticated", "path": "budget/:month/:year", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__authenticated/budget/$month/$year-G2FBJFCW.js", "imports": ["/build/_shared/chunk-FO2FZAZ4.js"], "hasAction": true, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__authenticated/categories/$budgetID": { "id": "routes/__authenticated/categories/$budgetID", "parentId": "routes/__authenticated", "path": "categories/:budgetID", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__authenticated/categories/$budgetID-4TNU6LLK.js", "imports": void 0, "hasAction": true, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__authenticated/categories/delete/$categoryID/$budgetID": { "id": "routes/__authenticated/categories/delete/$categoryID/$budgetID", "parentId": "routes/__authenticated", "path": "categories/delete/:categoryID/:budgetID", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__authenticated/categories/delete/$categoryID/$budgetID-PMI5TRE6.js", "imports": void 0, "hasAction": true, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__authenticated/profile": { "id": "routes/__authenticated/profile", "parentId": "routes/__authenticated", "path": "profile", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__authenticated/profile-Y7R2MRSE.js", "imports": void 0, "hasAction": false, "hasLoader": false, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__index": { "id": "routes/__index", "parentId": "root", "path": void 0, "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__index-S4WCJDOM.js", "imports": ["/build/_shared/chunk-J2TD3V3X.js", "/build/_shared/chunk-FO2FZAZ4.js"], "hasAction": false, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__index/index": { "id": "routes/__index/index", "parentId": "routes/__index", "path": void 0, "index": true, "caseSensitive": void 0, "module": "/build/routes/__index/index-EVBKKG2Q.js", "imports": void 0, "hasAction": false, "hasLoader": false, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__index/login": { "id": "routes/__index/login", "parentId": "routes/__index", "path": "login", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__index/login-7FA557VV.js", "imports": ["/build/_shared/chunk-PGVZMUP7.js", "/build/_shared/chunk-Y5AGIVAF.js", "/build/_shared/chunk-EWMPTY72.js"], "hasAction": true, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__index/register": { "id": "routes/__index/register", "parentId": "routes/__index", "path": "register", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__index/register-QHRQPOMI.js", "imports": ["/build/_shared/chunk-PGVZMUP7.js", "/build/_shared/chunk-Y5AGIVAF.js", "/build/_shared/chunk-EWMPTY72.js"], "hasAction": true, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/api/auth.callback": { "id": "routes/api/auth.callback", "parentId": "root", "path": "api/auth/callback", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/api/auth.callback-3KKF7YE5.js", "imports": ["/build/_shared/chunk-Y5AGIVAF.js", "/build/_shared/chunk-J2TD3V3X.js", "/build/_shared/chunk-FO2FZAZ4.js"], "hasAction": true, "hasLoader": false, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/api/logout": { "id": "routes/api/logout", "parentId": "root", "path": "api/logout", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/api/logout-M6GZIMZO.js", "imports": ["/build/_shared/chunk-J2TD3V3X.js", "/build/_shared/chunk-FO2FZAZ4.js"], "hasAction": true, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false } }, "url": "/build/manifest-B8267E8F.js" };
+var assets_manifest_default = { "version": "e8288f46", "entry": { "module": "/build/entry.client-BYM6EFLT.js", "imports": ["/build/_shared/chunk-3KBVUVEV.js", "/build/_shared/chunk-FN7GJDOI.js"] }, "routes": { "root": { "id": "root", "parentId": void 0, "path": "", "index": void 0, "caseSensitive": void 0, "module": "/build/root-PVGJWQEK.js", "imports": void 0, "hasAction": false, "hasLoader": true, "hasCatchBoundary": true, "hasErrorBoundary": true }, "routes/__authenticated": { "id": "routes/__authenticated", "parentId": "root", "path": void 0, "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__authenticated-42KQWPWI.js", "imports": ["/build/_shared/chunk-EWMPTY72.js"], "hasAction": false, "hasLoader": true, "hasCatchBoundary": true, "hasErrorBoundary": false }, "routes/__authenticated/budget/$month/$year": { "id": "routes/__authenticated/budget/$month/$year", "parentId": "routes/__authenticated", "path": "budget/:month/:year", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__authenticated/budget/$month/$year-G2FBJFCW.js", "imports": ["/build/_shared/chunk-FO2FZAZ4.js"], "hasAction": true, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__authenticated/categories/$budgetID": { "id": "routes/__authenticated/categories/$budgetID", "parentId": "routes/__authenticated", "path": "categories/:budgetID", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__authenticated/categories/$budgetID-2VSW5NCB.js", "imports": void 0, "hasAction": true, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__authenticated/categories/delete/$categoryID/$budgetID": { "id": "routes/__authenticated/categories/delete/$categoryID/$budgetID", "parentId": "routes/__authenticated", "path": "categories/delete/:categoryID/:budgetID", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__authenticated/categories/delete/$categoryID/$budgetID-PMI5TRE6.js", "imports": void 0, "hasAction": true, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__authenticated/profile": { "id": "routes/__authenticated/profile", "parentId": "routes/__authenticated", "path": "profile", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__authenticated/profile-Y7R2MRSE.js", "imports": void 0, "hasAction": false, "hasLoader": false, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__index": { "id": "routes/__index", "parentId": "root", "path": void 0, "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__index-S4WCJDOM.js", "imports": ["/build/_shared/chunk-J2TD3V3X.js", "/build/_shared/chunk-FO2FZAZ4.js"], "hasAction": false, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__index/index": { "id": "routes/__index/index", "parentId": "routes/__index", "path": void 0, "index": true, "caseSensitive": void 0, "module": "/build/routes/__index/index-EVBKKG2Q.js", "imports": void 0, "hasAction": false, "hasLoader": false, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__index/login": { "id": "routes/__index/login", "parentId": "routes/__index", "path": "login", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__index/login-7FA557VV.js", "imports": ["/build/_shared/chunk-PGVZMUP7.js", "/build/_shared/chunk-Y5AGIVAF.js", "/build/_shared/chunk-EWMPTY72.js"], "hasAction": true, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__index/register": { "id": "routes/__index/register", "parentId": "routes/__index", "path": "register", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__index/register-QHRQPOMI.js", "imports": ["/build/_shared/chunk-PGVZMUP7.js", "/build/_shared/chunk-Y5AGIVAF.js", "/build/_shared/chunk-EWMPTY72.js"], "hasAction": true, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/api/auth.callback": { "id": "routes/api/auth.callback", "parentId": "root", "path": "api/auth/callback", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/api/auth.callback-3KKF7YE5.js", "imports": ["/build/_shared/chunk-Y5AGIVAF.js", "/build/_shared/chunk-J2TD3V3X.js", "/build/_shared/chunk-FO2FZAZ4.js"], "hasAction": true, "hasLoader": false, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/api/logout": { "id": "routes/api/logout", "parentId": "root", "path": "api/logout", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/api/logout-M6GZIMZO.js", "imports": ["/build/_shared/chunk-J2TD3V3X.js", "/build/_shared/chunk-FO2FZAZ4.js"], "hasAction": true, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false } }, "url": "/build/manifest-E8288F46.js" };
 
 // server-entry-module:@remix-run/dev/server-build
 var entry = { module: entry_server_exports };

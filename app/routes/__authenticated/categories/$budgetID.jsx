@@ -65,30 +65,68 @@ export default function Categories() {
   const trs = categories.map((cat) => {
     const { name, amount, id } = cat;
     return (
-      <li key={id}>
-        <Form method="post">
-          <label>
-            {name}
+      <tr key={id}>
+        <td scope="row">{name}</td>
+        <td>
+          <input
+            form={`myForm-${id}`}
+            aria-label={name}
+            defaultValue={amount}
+            name="amount"
+          />
+        </td>
 
-            <input aria-label={name} defaultValue={amount} name="amount" />
-          </label>
-
-          <button type="submit" name="_action" value="update">
+        <td>
+          <button
+            form={`myForm-${id}`}
+            type="submit"
+            name="_action"
+            value="update"
+          >
             Update
           </button>
-          <button name="_action" value="delete">
+        </td>
+        <td>
+          <button form={`myForm-${id}`} name="_action" value="delete">
             Delete
           </button>
-          <input type="hidden" id="id" name="id" value={id} />
-        </Form>
-      </li>
+        </td>
+
+        <td>
+          <input
+            type="hidden"
+            id="id"
+            name="id"
+            value={id}
+            form={`myForm-${id}`}
+          />
+        </td>
+      </tr>
     );
   });
-
+  const forms = categories.map((cat) => {
+    const { id } = cat;
+    return (
+      <Form key={id} id={`myForm-${id}`} name={`myForm-${id}`} method="post" />
+    );
+  });
   return (
     <div>
       <h1>{`Categories for ${month}/${year}`}</h1>
-      {categories?.length > 0 && <ul>{trs}</ul>}
+      {categories?.length > 0 && (
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Name</th>
+              <th scope="col">Amount</th>
+              <th scope="col">Update</th>
+              <th scope="col">Delete</th>
+            </tr>
+          </thead>
+          <tbody>{trs}</tbody>
+        </table>
+      )}
+      {forms}
       <h2>add New Category</h2>
       <Form method="post">
         <label htmlFor="name">Name</label>
