@@ -4,11 +4,10 @@ import {
   Form,
   useActionData,
   useLoaderData,
-  useSearchParams,
   useSubmit,
   useTransition,
 } from "@remix-run/react";
-
+import { useRef } from "react";
 import { supabaseAdmin } from "~/services/supabase.server";
 //import { getUserByAccessToken } from "~/api/supabase-auth.server";
 import { getAccessToken } from "~/policies/authenticated.server";
@@ -30,9 +29,16 @@ export async function action({ request }) {
       const _action = data.get("_action");
       const month = data.get("month");
       const year = data.get("year");
-      console.log(`year=${year}`);
+
       if (_action === "Select") {
         return redirect(`/budget/${month}/${year}`);
+      }
+      const errors = {};
+      if (isNaN(income.replace("$", "").replace(",", ""))) {
+        errors.income = "Your income must be a number";
+      }
+      if (Object.keys(errors).length > 0) {
+        return { errors };
       }
       supabaseAdmin.auth.setAuth(await getAccessToken(request));
       if (id === "-1") {
@@ -59,7 +65,6 @@ export async function action({ request }) {
         }
         return json({ success: "Row Inserted Successfully." });
       }
-      return null;
     },
     () => {
       throw new Response("unauthorized", { status: 401 });
@@ -78,7 +83,7 @@ export async function loader({ request, params }) {
   const accessToken = await getAccessToken(request);
 
   supabaseAdmin.auth.setAuth(accessToken);
-  const { data, error } = await supabaseAdmin
+  const { data } = await supabaseAdmin
     .from("budgets")
     .select()
     .match({ month, year });
@@ -95,6 +100,7 @@ export default function Budget() {
   const transition = useTransition();
   const { income, id, user_id, month, year } = useLoaderData();
   const actionData = useActionData();
+  const { errors } = useActionData() || {};
   const [incomeTxt, setIncomeTxt] = useState("");
   useEffect(() => {
     setIncomeTxt(income);
@@ -111,6 +117,12 @@ export default function Budget() {
       { method: "post" }
     );
   };
+  const incomeRef = useRef();
+  useEffect(() => {
+    if (errors?.income) {
+      incomeRef.current.focus();
+    }
+  }, [errors]);
   return (
     <div>
       <Form method="post">
@@ -150,6 +162,7 @@ export default function Budget() {
         <input type="hidden" name="id" value={id} />
         <label htmlFor="income">Income</label>
         <input
+          ref={incomeRef}
           id="income"
           type="text"
           name="income"
@@ -159,7 +172,10 @@ export default function Budget() {
             e.preventDefault();
             setIncomeTxt(e.target.value);
           }}
+          aria-describedby="incomeError"
         />
+
+        <span id="incomeError">{errors?.income}</span>
         <button
           type="submit"
           _action="update"
