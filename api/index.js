@@ -530,11 +530,11 @@ function DeleteCategory() {
   }, "Cancel")));
 }
 
-// route:c:\dev\budget-management-remix\app\routes\__authenticated\categories\$budgetID.jsx
-var budgetID_exports2 = {};
-__export(budgetID_exports2, {
+// route:c:\dev\budget-management-remix\app\routes\__authenticated\transactions.$categoryID.jsx
+var transactions_categoryID_exports = {};
+__export(transactions_categoryID_exports, {
   action: () => action3,
-  default: () => Categories,
+  default: () => Transactions,
   loader: () => loader4,
   meta: () => meta2
 });
@@ -551,13 +551,129 @@ function formatCurrency(num) {
   return formatter.format(num);
 }
 
-// route:c:\dev\budget-management-remix\app\routes\__authenticated\categories\$budgetID.jsx
+// route:c:\dev\budget-management-remix\app\routes\__authenticated\transactions.$categoryID.jsx
 var import_react9 = require("@remix-run/react");
 var import_node7 = require("@remix-run/node");
 function meta2() {
-  return { title: "Budget Management|Categories" };
+  return { title: "Budget Management|Transactions" };
 }
 async function action3({ request, params }) {
+  supabaseAdmin.auth.setAuth(await getAccessToken(request));
+  const transaction = await request.formData();
+  const name2 = transaction.get("name");
+  const id = transaction.get("id");
+  const amount = transaction.get("amount");
+  const transaction_date = transaction.get("transaction_date");
+  const _action = transaction.get("_action");
+  if (_action === "insert") {
+    await supabaseAdmin.from("transactions").insert({
+      name: name2,
+      amount,
+      transaction_date,
+      category_id: params.categoryID
+    });
+  } else if (_action === "update") {
+    const { error } = await supabaseAdmin.from("transactions").update({
+      transaction_date,
+      amount
+    }).match({ id });
+    console.log(error);
+  }
+  return null;
+}
+async function loader4({ request, params }) {
+  const { data: category } = await supabaseAdmin.from("categories").select().match({ id: params.categoryID }).limit(1).single();
+  const { data: transactions, error } = await supabaseAdmin.from("vw_transactions").select().match({ category_id: params.categoryID });
+  return (0, import_node7.json)({ category, transactions });
+}
+function Transactions() {
+  const { transactions, category } = (0, import_react8.useLoaderData)();
+  const trs = transactions.map((t) => {
+    const { id, name: name2, transaction_date, amount } = t;
+    return /* @__PURE__ */ React.createElement("tr", {
+      key: id
+    }, /* @__PURE__ */ React.createElement("td", null, name2), /* @__PURE__ */ React.createElement("td", null, /* @__PURE__ */ React.createElement("input", {
+      type: "text",
+      name: "transaction_date",
+      form: `transactions-${id}`,
+      "aria-label": `${name2} Date`,
+      defaultValue: transaction_date
+    })), /* @__PURE__ */ React.createElement("td", null, /* @__PURE__ */ React.createElement("input", {
+      type: "text",
+      name: "amount",
+      form: `transactions-${id}`,
+      "aria-label": `${name2} Amount`,
+      defaultValue: amount
+    })), /* @__PURE__ */ React.createElement("td", null, /* @__PURE__ */ React.createElement("input", {
+      type: "submit",
+      name: "_action",
+      form: `transactions-${id}`,
+      value: "update"
+    }), /* @__PURE__ */ React.createElement("input", {
+      type: "hidden",
+      form: `transactions-${id}`,
+      value: id,
+      name: "id"
+    })));
+  });
+  const forms = transactions.map((t) => {
+    const { id } = t;
+    return /* @__PURE__ */ React.createElement(import_react9.Form, {
+      id: `transactions-${id}`,
+      method: "post"
+    });
+  });
+  return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h1", null, "Transactions for ", category.name), /* @__PURE__ */ React.createElement(import_react9.Form, {
+    method: "post"
+  }, /* @__PURE__ */ React.createElement("label", {
+    htmlFor: "name"
+  }, "Name"), /* @__PURE__ */ React.createElement("input", {
+    type: "text",
+    name: "name",
+    id: "name"
+  }), /* @__PURE__ */ React.createElement("label", {
+    htmlFor: "transaction_date"
+  }, "Date"), /* @__PURE__ */ React.createElement("input", {
+    type: "text",
+    name: "transaction_date",
+    id: "transaction_date"
+  }), /* @__PURE__ */ React.createElement("label", {
+    htmlFor: "amount"
+  }, "Amount"), /* @__PURE__ */ React.createElement("input", {
+    type: "text",
+    name: "amount",
+    id: "amount"
+  }), /* @__PURE__ */ React.createElement("button", {
+    type: "submit",
+    name: "_action",
+    value: "insert"
+  }, "Add")), /* @__PURE__ */ React.createElement("h2", null, "Current Transactions"), /* @__PURE__ */ React.createElement("table", null, /* @__PURE__ */ React.createElement("thead", null, /* @__PURE__ */ React.createElement("tr", null, /* @__PURE__ */ React.createElement("th", {
+    scope: "col"
+  }, "Name"), /* @__PURE__ */ React.createElement("th", {
+    scope: "col"
+  }, "Date"), /* @__PURE__ */ React.createElement("th", {
+    scope: "col"
+  }, "Amount"), /* @__PURE__ */ React.createElement("th", {
+    scope: "col"
+  }, "Update"))), /* @__PURE__ */ React.createElement("tbody", null, trs)), forms);
+}
+
+// route:c:\dev\budget-management-remix\app\routes\__authenticated\categories\$budgetID.jsx
+var budgetID_exports2 = {};
+__export(budgetID_exports2, {
+  action: () => action4,
+  default: () => Categories,
+  loader: () => loader5,
+  meta: () => meta3
+});
+init_react();
+var import_react10 = require("@remix-run/react");
+var import_react11 = require("@remix-run/react");
+var import_node8 = require("@remix-run/node");
+function meta3() {
+  return { title: "Budget Management|Categories" };
+}
+async function action4({ request, params }) {
   return authenticated(request, async (user) => {
     const { budgetID } = params;
     const data = await request.formData();
@@ -567,7 +683,7 @@ async function action3({ request, params }) {
     const _action = data.get("_action");
     supabaseAdmin.auth.setAuth(await getAccessToken(request));
     if (_action === "delete") {
-      return (0, import_node7.redirect)(`/categories/delete/${id}/${params.budgetID}`);
+      return (0, import_node8.redirect)(`/categories/delete/${id}/${params.budgetID}`);
     }
     if (_action === "insert") {
       await supabaseAdmin.from("categories").insert({ budget_id: budgetID, name: name2, amount });
@@ -579,7 +695,7 @@ async function action3({ request, params }) {
     throw new Response("unauthorized", { status: 401 });
   });
 }
-async function loader4({ request, params }) {
+async function loader5({ request, params }) {
   supabaseAdmin.auth.setAuth(await getAccessToken(request));
   const { budgetID } = params;
   let { data: categories } = await supabaseAdmin.from("categories").select().match({ budget_id: budgetID });
@@ -587,12 +703,12 @@ async function loader4({ request, params }) {
     return parseFloat(p) + parseFloat(c.amount.replace("$", "").replace(",", ""));
   }, 0);
   let { data: budget, error } = await supabaseAdmin.from("budgets").select().match({ id: budgetID }).limit(1).single();
-  return (0, import_node7.json)({ budget, categories, totalBudgeted });
+  return (0, import_node8.json)({ budget, categories, totalBudgeted });
 }
 function Categories() {
-  const { budget, categories, totalBudgeted } = (0, import_react8.useLoaderData)();
+  const { budget, categories, totalBudgeted } = (0, import_react10.useLoaderData)();
   const { month, year, income } = budget;
-  const transition = (0, import_react8.useTransition)();
+  const transition = (0, import_react10.useTransition)();
   const trs = categories.map((cat) => {
     const { name: name2, amount, id } = cat;
     return /* @__PURE__ */ React.createElement("tr", {
@@ -613,7 +729,9 @@ function Categories() {
       form: `myForm-${id}`,
       name: "_action",
       value: "delete"
-    }, "Delete")), /* @__PURE__ */ React.createElement("td", null, /* @__PURE__ */ React.createElement("input", {
+    }, "Delete")), /* @__PURE__ */ React.createElement("td", null, /* @__PURE__ */ React.createElement(import_react10.Link, {
+      to: `/transactions/${id}`
+    }, "View Transactions"), /* @__PURE__ */ React.createElement("input", {
       type: "hidden",
       id: "id",
       name: "id",
@@ -623,7 +741,7 @@ function Categories() {
   });
   const forms = categories.map((cat) => {
     const { id } = cat;
-    return /* @__PURE__ */ React.createElement(import_react9.Form, {
+    return /* @__PURE__ */ React.createElement(import_react11.Form, {
       key: id,
       id: `myForm-${id}`,
       name: `myForm-${id}`,
@@ -638,7 +756,9 @@ function Categories() {
     scope: "col"
   }, "Update"), /* @__PURE__ */ React.createElement("th", {
     scope: "col"
-  }, "Delete"))), /* @__PURE__ */ React.createElement("tbody", null, trs)), forms, /* @__PURE__ */ React.createElement("h2", null, "add New Category"), /* @__PURE__ */ React.createElement(import_react9.Form, {
+  }, "Delete"), /* @__PURE__ */ React.createElement("th", {
+    scope: "col"
+  }, "View Transactions"))), /* @__PURE__ */ React.createElement("tbody", null, trs)), forms, /* @__PURE__ */ React.createElement("h2", null, "add New Category"), /* @__PURE__ */ React.createElement(import_react11.Form, {
     method: "post"
   }, /* @__PURE__ */ React.createElement("label", {
     htmlFor: "name"
@@ -661,7 +781,7 @@ function Categories() {
   }, "Add")), "Total income: ", income, /* @__PURE__ */ React.createElement("br", null), "Total Budgeted: ", formatCurrency(totalBudgeted), /* @__PURE__ */ React.createElement("div", {
     "aria-live": "polite",
     role: "alert"
-  }, "There is", formatCurrency(parseFloat(income.replace("$", "").replace(",", "")) - totalBudgeted), " ", "left to budget."), /* @__PURE__ */ React.createElement(import_react8.Link, {
+  }, "There is", formatCurrency(parseFloat(income.replace("$", "").replace(",", "")) - totalBudgeted), " ", "left to budget."), /* @__PURE__ */ React.createElement(import_react10.Link, {
     to: `/budget/${budget.month}/${budget.year}`
   }, "Back To Budget Management"));
 }
@@ -669,20 +789,20 @@ function Categories() {
 // route:c:\dev\budget-management-remix\app\routes\__authenticated\budget\$month\$year.jsx
 var year_exports = {};
 __export(year_exports, {
-  action: () => action4,
+  action: () => action5,
   default: () => Budget,
-  loader: () => loader5,
-  meta: () => meta3
+  loader: () => loader6,
+  meta: () => meta4
 });
 init_react();
-var import_node8 = require("@remix-run/node");
-var import_react10 = require("@remix-run/react");
-var import_react11 = require("react");
-var import_react12 = require("react");
-function meta3() {
+var import_node9 = require("@remix-run/node");
+var import_react12 = require("@remix-run/react");
+var import_react13 = require("react");
+var import_react14 = require("react");
+function meta4() {
   return { title: "Budget Management|Main Console" };
 }
-async function action4({ request }) {
+async function action5({ request }) {
   return authenticated(request, async (user) => {
     const data = await request.formData();
     const id = data.get("id");
@@ -692,7 +812,7 @@ async function action4({ request }) {
     const month = data.get("month");
     const year = data.get("year");
     if (_action === "Select") {
-      return (0, import_node8.redirect)(`/budget/${month}/${year}`);
+      return (0, import_node9.redirect)(`/budget/${month}/${year}`);
     }
     const errors = {};
     if (isNaN(income.replace("$", "").replace(",", ""))) {
@@ -711,22 +831,22 @@ async function action4({ request }) {
         income
       });
       if (error) {
-        return (0, import_node8.json)({ error: error.message });
+        return (0, import_node9.json)({ error: error.message });
       }
-      return (0, import_node8.json)({ success: "Row Inserted Successfully." });
+      return (0, import_node9.json)({ success: "Row Inserted Successfully." });
     } else {
       supabaseAdmin.auth.setAuth(await getAccessToken(request));
       const { error } = await supabaseAdmin.from("budgets").update({ income }).match({ id });
       if (error) {
-        return (0, import_node8.json)({ error: error.message });
+        return (0, import_node9.json)({ error: error.message });
       }
-      return (0, import_node8.json)({ success: "Row Inserted Successfully." });
+      return (0, import_node9.json)({ success: "Row Inserted Successfully." });
     }
   }, () => {
     throw new Response("unauthorized", { status: 401 });
   });
 }
-async function loader5({ request, params }) {
+async function loader6({ request, params }) {
   let { month, year } = params;
   if (month === null) {
     console.log("bad error.");
@@ -736,21 +856,21 @@ async function loader5({ request, params }) {
   supabaseAdmin.auth.setAuth(accessToken);
   const { data } = await supabaseAdmin.from("budgets").select().match({ month, year });
   if (!data || (data == null ? void 0 : data.length) === 0) {
-    return (0, import_node8.json)({ id: -1, month, year, income: 0, user_id: "" });
+    return (0, import_node9.json)({ id: -1, month, year, income: 0, user_id: "" });
   } else {
-    return (0, import_node8.json)(data[0]);
+    return (0, import_node9.json)(data[0]);
   }
 }
 function Budget() {
-  const transition = (0, import_react10.useTransition)();
-  const { income, id, user_id, month, year } = (0, import_react10.useLoaderData)();
-  const actionData = (0, import_react10.useActionData)();
-  const { errors } = (0, import_react10.useActionData)() || {};
-  const [incomeTxt, setIncomeTxt] = (0, import_react12.useState)("");
-  (0, import_react12.useEffect)(() => {
+  const transition = (0, import_react12.useTransition)();
+  const { income, id, user_id, month, year } = (0, import_react12.useLoaderData)();
+  const actionData = (0, import_react12.useActionData)();
+  const { errors } = (0, import_react12.useActionData)() || {};
+  const [incomeTxt, setIncomeTxt] = (0, import_react14.useState)("");
+  (0, import_react14.useEffect)(() => {
     setIncomeTxt(income);
   }, [income]);
-  const submit = (0, import_react10.useSubmit)();
+  const submit = (0, import_react12.useSubmit)();
   const handleSelection = (e) => {
     submit({
       _action: "Select",
@@ -758,13 +878,13 @@ function Budget() {
       year: document.getElementById("year").value
     }, { method: "post" });
   };
-  const incomeRef = (0, import_react11.useRef)();
-  (0, import_react12.useEffect)(() => {
+  const incomeRef = (0, import_react13.useRef)();
+  (0, import_react14.useEffect)(() => {
     if (errors == null ? void 0 : errors.income) {
       incomeRef.current.focus();
     }
   }, [errors]);
-  return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement(import_react10.Form, {
+  return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement(import_react12.Form, {
     method: "post"
   }, /* @__PURE__ */ React.createElement("label", {
     htmlFor: "month"
@@ -846,16 +966,16 @@ function Budget() {
 var profile_exports = {};
 __export(profile_exports, {
   default: () => Profile,
-  meta: () => meta4
+  meta: () => meta5
 });
 init_react();
 
 // app/hooks/useUser.js
 init_react();
-var import_react13 = require("@remix-run/react");
+var import_react15 = require("@remix-run/react");
 function useRouteData(routeId) {
   var _a;
-  return (_a = (0, import_react13.useMatches)().find((match) => match.id === routeId)) == null ? void 0 : _a.data;
+  return (_a = (0, import_react15.useMatches)().find((match) => match.id === routeId)) == null ? void 0 : _a.data;
 }
 function useUser() {
   const loaderData = useRouteData("routes/__authenticated");
@@ -866,8 +986,8 @@ function useUser() {
 }
 
 // route:c:\dev\budget-management-remix\app\routes\__authenticated\profile.jsx
-var import_react14 = require("@remix-run/react");
-function meta4() {
+var import_react16 = require("@remix-run/react");
+function meta5() {
   return { title: "Supabase x Remix | Profile" };
 }
 function Profile() {
@@ -876,7 +996,7 @@ function Profile() {
     style: { textAlign: "center" }
   }, /* @__PURE__ */ React.createElement("h1", null, "Hello ", user.email, "!"), /* @__PURE__ */ React.createElement("pre", {
     style: { textAlign: "left" }
-  }, /* @__PURE__ */ React.createElement("code", null, JSON.stringify(user, null, 2))), /* @__PURE__ */ React.createElement(import_react14.Form, {
+  }, /* @__PURE__ */ React.createElement("code", null, JSON.stringify(user, null, 2))), /* @__PURE__ */ React.createElement(import_react16.Form, {
     method: "post",
     action: "/api/logout"
   }, /* @__PURE__ */ React.createElement("button", {
@@ -887,25 +1007,25 @@ function Profile() {
 // route:c:\dev\budget-management-remix\app\routes\api\logout.js
 var logout_exports = {};
 __export(logout_exports, {
-  action: () => action5,
+  action: () => action6,
   default: () => Logout,
-  loader: () => loader6
+  loader: () => loader7
 });
 init_react();
-var import_node9 = require("@remix-run/node");
-function loader6() {
-  return (0, import_node9.redirect)("/");
+var import_node10 = require("@remix-run/node");
+function loader7() {
+  return (0, import_node10.redirect)("/");
 }
-async function action5({ request }) {
+async function action6({ request }) {
   let session = await authCookie.getSession(request.headers.get("Cookie"));
   if (!session) {
-    return (0, import_node9.redirect)("/login");
+    return (0, import_node10.redirect)("/login");
   }
   const { done, error } = await signOutUser(session);
   if (error || !done) {
     console.log("Error signing out user in supabase", error);
   }
-  return (0, import_node9.redirect)("/login", {
+  return (0, import_node10.redirect)("/login", {
     headers: { "Set-Cookie": await authCookie.destroySession(session) }
   });
 }
@@ -917,62 +1037,62 @@ function Logout() {
 var index_exports = {};
 __export(index_exports, {
   default: () => IndexLayout,
-  loader: () => loader7
+  loader: () => loader8
 });
 init_react();
-var import_node10 = require("@remix-run/node");
-var import_react15 = require("@remix-run/react");
-var loader7 = async ({ request }) => {
+var import_node11 = require("@remix-run/node");
+var import_react17 = require("@remix-run/react");
+var loader8 = async ({ request }) => {
   const authSession = await authCookie.getSession(request.headers.get("Cookie"));
   const { user, error: getUserError } = await getUserByAccessToken(authSession.get("access_token"));
-  return (0, import_node10.json)({ user });
+  return (0, import_node11.json)({ user });
 };
 function IndexLayout() {
-  const { user } = (0, import_react15.useLoaderData)();
+  const { user } = (0, import_react17.useLoaderData)();
   return /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("header", null, /* @__PURE__ */ React.createElement("ul", {
     style: { display: "flex", listStyleType: "none", padding: 0 }
   }, /* @__PURE__ */ React.createElement("li", {
     style: { margin: 4 }
-  }, /* @__PURE__ */ React.createElement(import_react15.Link, {
+  }, /* @__PURE__ */ React.createElement(import_react17.Link, {
     to: "/"
   }, "Home")), user ? /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("li", {
     style: { margin: 4 }
-  }, /* @__PURE__ */ React.createElement(import_react15.Link, {
+  }, /* @__PURE__ */ React.createElement(import_react17.Link, {
     to: "/profile"
   }, "Profile")), /* @__PURE__ */ React.createElement("li", {
     style: { margin: 4 }
-  }, /* @__PURE__ */ React.createElement(import_react15.Link, {
+  }, /* @__PURE__ */ React.createElement(import_react17.Link, {
     to: `/budget/${new Date().getMonth() + 1}/${new Date().getFullYear()}`
   }, "Budget Management"))) : /* @__PURE__ */ React.createElement(React.Fragment, null, /* @__PURE__ */ React.createElement("li", {
     style: { margin: 4 }
-  }, /* @__PURE__ */ React.createElement(import_react15.Link, {
+  }, /* @__PURE__ */ React.createElement(import_react17.Link, {
     to: "/login"
   }, "Login")), /* @__PURE__ */ React.createElement("li", {
     style: { margin: 4 }
-  }, /* @__PURE__ */ React.createElement(import_react15.Link, {
+  }, /* @__PURE__ */ React.createElement(import_react17.Link, {
     to: "/register"
-  }, "Register"))))), /* @__PURE__ */ React.createElement("main", null, /* @__PURE__ */ React.createElement(import_react15.Outlet, null)));
+  }, "Register"))))), /* @__PURE__ */ React.createElement("main", null, /* @__PURE__ */ React.createElement(import_react17.Outlet, null)));
 }
 
 // route:c:\dev\budget-management-remix\app\routes\__index\register.jsx
 var register_exports = {};
 __export(register_exports, {
-  action: () => action6,
+  action: () => action7,
   default: () => Register,
-  loader: () => loader8,
-  meta: () => meta5
+  loader: () => loader9,
+  meta: () => meta6
 });
 init_react();
-var import_react17 = require("@remix-run/react");
-var import_node11 = require("@remix-run/node");
+var import_react19 = require("@remix-run/react");
+var import_node12 = require("@remix-run/node");
 
 // app/components/AuthProviderBtn.jsx
 init_react();
-var import_react16 = require("react");
+var import_react18 = require("react");
 var import_supabase_auth5 = __toESM(require_supabase_auth());
 function AuthProviderBtn(_a) {
   var _b = _a, { provider, redirectTo } = _b, props = __objRest(_b, ["provider", "redirectTo"]);
-  const handleOnClick = (0, import_react16.useCallback)(async () => {
+  const handleOnClick = (0, import_react18.useCallback)(async () => {
     try {
       await (0, import_supabase_auth5.continueWithProvider)({ provider, redirectTo });
     } catch (error) {
@@ -986,22 +1106,22 @@ function AuthProviderBtn(_a) {
 }
 
 // route:c:\dev\budget-management-remix\app\routes\__index\register.jsx
-function meta5() {
+function meta6() {
   return { title: "Budget Management| Register" };
 }
-async function loader8({ request }) {
+async function loader9({ request }) {
   return authenticated(request, () => {
-    return (0, import_node11.redirect)(`/budget/${new Date().getMonth() + 1}/${new Date().getFullYear()}`);
+    return (0, import_node12.redirect)(`/budget/${new Date().getMonth() + 1}/${new Date().getFullYear()}`);
   }, () => {
-    return (0, import_node11.json)({});
+    return (0, import_node12.json)({});
   });
 }
-async function action6({ request }) {
+async function action7({ request }) {
   const form = await request.formData();
   const email = form.get("email");
   const password = form.get("password");
   if (!email || !password || typeof email !== "string" || typeof password !== "string" || password.length < 8) {
-    return (0, import_node11.json)({
+    return (0, import_node12.json)({
       formError: `Form not submitted correctly.`,
       fields: {
         email: String(email) ?? ""
@@ -1013,13 +1133,13 @@ async function action6({ request }) {
     password
   });
   if (error || !user) {
-    return (0, import_node11.json)({ formError: error || "Something went wrong", fields: { email } }, 401);
+    return (0, import_node12.json)({ formError: error || "Something went wrong", fields: { email } }, 401);
   }
-  return (0, import_node11.json)({ result: "success" }, { status: 201 });
+  return (0, import_node12.json)({ result: "success" }, { status: 201 });
 }
 function Register() {
   var _a;
-  const actionData = (0, import_react17.useActionData)();
+  const actionData = (0, import_react19.useActionData)();
   return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h1", null, "Register"), /* @__PURE__ */ React.createElement("div", {
     style: { margin: 5 }
   }, /* @__PURE__ */ React.createElement(AuthProviderBtn, {
@@ -1029,7 +1149,7 @@ function Register() {
     style: { margin: 5 }
   }, /* @__PURE__ */ React.createElement(AuthProviderBtn, {
     provider: "facebook"
-  })), /* @__PURE__ */ React.createElement("p", null, "Or continue with email/password"), /* @__PURE__ */ React.createElement(import_react17.Form, {
+  })), /* @__PURE__ */ React.createElement("p", null, "Or continue with email/password"), /* @__PURE__ */ React.createElement(import_react19.Form, {
     replace: true,
     method: "post"
   }, /* @__PURE__ */ React.createElement("fieldset", null, /* @__PURE__ */ React.createElement("legend", null, "Register"), /* @__PURE__ */ React.createElement("div", {
@@ -1047,7 +1167,7 @@ function Register() {
     style: { margin: 5 }
   }, /* @__PURE__ */ React.createElement("button", {
     type: "submit"
-  }, "Register")))), /* @__PURE__ */ React.createElement("p", null, "Have an account? ", /* @__PURE__ */ React.createElement(import_react17.Link, {
+  }, "Register")))), /* @__PURE__ */ React.createElement("p", null, "Have an account? ", /* @__PURE__ */ React.createElement(import_react19.Link, {
     to: "/login"
   }, "Login"), " instead"), (actionData == null ? void 0 : actionData.formError) ? /* @__PURE__ */ React.createElement("p", {
     style: { color: "red" }
@@ -1060,10 +1180,10 @@ function Register() {
 var index_exports2 = {};
 __export(index_exports2, {
   default: () => Index,
-  meta: () => meta6
+  meta: () => meta7
 });
 init_react();
-function meta6() {
+function meta7() {
   return { title: "Budget Management| Home" };
 }
 function Index() {
@@ -1075,33 +1195,33 @@ function Index() {
 // route:c:\dev\budget-management-remix\app\routes\__index\login.jsx
 var login_exports = {};
 __export(login_exports, {
-  action: () => action7,
+  action: () => action8,
   default: () => Login,
-  loader: () => loader9,
-  meta: () => meta7
+  loader: () => loader10,
+  meta: () => meta8
 });
 init_react();
-var import_react18 = require("react");
-var import_node12 = require("@remix-run/node");
-var import_react19 = require("@remix-run/react");
-function meta7() {
+var import_react20 = require("react");
+var import_node13 = require("@remix-run/node");
+var import_react21 = require("@remix-run/react");
+function meta8() {
   return { title: "Budget Management| Login" };
 }
-async function loader9({ request }) {
+async function loader10({ request }) {
   return authenticated(request, () => {
-    return (0, import_node12.redirect)(`/budget/${new Date().getMonth() + 1}/${new Date().getFullYear()}`);
+    return (0, import_node13.redirect)(`/budget/${new Date().getMonth() + 1}/${new Date().getFullYear()}`);
   }, () => {
-    return (0, import_node12.json)({});
+    return (0, import_node13.json)({});
   });
 }
-async function action7({ request }) {
+async function action8({ request }) {
   let session = await authCookie.getSession(request.headers.get("Cookie"));
   const form = await request.formData();
   const email = form.get("email");
   const password = form.get("password");
   const redirectTo = form.get("redirectTo") || "/budget";
   if (!email || !password || typeof redirectTo !== "string" || typeof email !== "string" || typeof password !== "string") {
-    return (0, import_node12.json)({
+    return (0, import_node13.json)({
       formError: `Form not submitted correctly.`,
       fields: {
         email: String(email) ?? ""
@@ -1113,10 +1233,10 @@ async function action7({ request }) {
     password
   });
   if (error || !accessToken || !refreshToken) {
-    return (0, import_node12.json)({ formError: error || "Something went wrong", fields: { email } }, 403);
+    return (0, import_node13.json)({ formError: error || "Something went wrong", fields: { email } }, 403);
   }
   session = setAuthSession(session, accessToken, refreshToken);
-  return (0, import_node12.redirect)(redirectTo, {
+  return (0, import_node13.redirect)(redirectTo, {
     headers: {
       "Set-Cookie": await authCookie.commitSession(session)
     }
@@ -1124,9 +1244,9 @@ async function action7({ request }) {
 }
 function Login() {
   var _a;
-  const actionData = (0, import_react19.useActionData)();
-  const [searchParams] = (0, import_react19.useSearchParams)();
-  const redirectTo = (0, import_react18.useMemo)(() => searchParams.get("redirectTo") ?? `/budget/${new Date().getMonth() + 1}/${new Date().getFullYear()}`, [searchParams]);
+  const actionData = (0, import_react21.useActionData)();
+  const [searchParams] = (0, import_react21.useSearchParams)();
+  const redirectTo = (0, import_react20.useMemo)(() => searchParams.get("redirectTo") ?? `/budget/${new Date().getMonth() + 1}/${new Date().getFullYear()}`, [searchParams]);
   return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h1", null, "Login"), /* @__PURE__ */ React.createElement("div", {
     style: { margin: 5 }
   }, /* @__PURE__ */ React.createElement(AuthProviderBtn, {
@@ -1134,7 +1254,7 @@ function Login() {
     redirectTo
   })), /* @__PURE__ */ React.createElement("div", {
     style: { margin: 5 }
-  }), /* @__PURE__ */ React.createElement("p", null, "Or continue with email/password"), /* @__PURE__ */ React.createElement(import_react19.Form, {
+  }), /* @__PURE__ */ React.createElement("p", null, "Or continue with email/password"), /* @__PURE__ */ React.createElement(import_react21.Form, {
     replace: true,
     method: "post"
   }, /* @__PURE__ */ React.createElement("input", {
@@ -1157,7 +1277,7 @@ function Login() {
     style: { margin: 5 }
   }, /* @__PURE__ */ React.createElement("button", {
     type: "submit"
-  }, "Login")))), /* @__PURE__ */ React.createElement("p", null, "Don't have an account yet? ", /* @__PURE__ */ React.createElement(import_react19.Link, {
+  }, "Login")))), /* @__PURE__ */ React.createElement("p", null, "Don't have an account yet? ", /* @__PURE__ */ React.createElement(import_react21.Link, {
     to: "/register"
   }, "Register"), " instead"), (actionData == null ? void 0 : actionData.formError) ? /* @__PURE__ */ React.createElement("p", {
     style: { color: "red" }
@@ -1166,7 +1286,7 @@ function Login() {
 
 // server-assets-manifest:@remix-run/dev/assets-manifest
 init_react();
-var assets_manifest_default = { "version": "cb42023b", "entry": { "module": "/build/entry.client-BYM6EFLT.js", "imports": ["/build/_shared/chunk-3KBVUVEV.js", "/build/_shared/chunk-FN7GJDOI.js"] }, "routes": { "root": { "id": "root", "parentId": void 0, "path": "", "index": void 0, "caseSensitive": void 0, "module": "/build/root-PVGJWQEK.js", "imports": void 0, "hasAction": false, "hasLoader": true, "hasCatchBoundary": true, "hasErrorBoundary": true }, "routes/__authenticated": { "id": "routes/__authenticated", "parentId": "root", "path": void 0, "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__authenticated-42KQWPWI.js", "imports": ["/build/_shared/chunk-EWMPTY72.js"], "hasAction": false, "hasLoader": true, "hasCatchBoundary": true, "hasErrorBoundary": false }, "routes/__authenticated/budget/$month/$year": { "id": "routes/__authenticated/budget/$month/$year", "parentId": "routes/__authenticated", "path": "budget/:month/:year", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__authenticated/budget/$month/$year-IP7UKO4D.js", "imports": ["/build/_shared/chunk-FO2FZAZ4.js"], "hasAction": true, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__authenticated/categories/$budgetID": { "id": "routes/__authenticated/categories/$budgetID", "parentId": "routes/__authenticated", "path": "categories/:budgetID", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__authenticated/categories/$budgetID-2VSW5NCB.js", "imports": void 0, "hasAction": true, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__authenticated/categories/delete/$categoryID/$budgetID": { "id": "routes/__authenticated/categories/delete/$categoryID/$budgetID", "parentId": "routes/__authenticated", "path": "categories/delete/:categoryID/:budgetID", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__authenticated/categories/delete/$categoryID/$budgetID-PMI5TRE6.js", "imports": void 0, "hasAction": true, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__authenticated/profile": { "id": "routes/__authenticated/profile", "parentId": "routes/__authenticated", "path": "profile", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__authenticated/profile-Y7R2MRSE.js", "imports": void 0, "hasAction": false, "hasLoader": false, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__index": { "id": "routes/__index", "parentId": "root", "path": void 0, "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__index-S4WCJDOM.js", "imports": ["/build/_shared/chunk-J2TD3V3X.js", "/build/_shared/chunk-FO2FZAZ4.js"], "hasAction": false, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__index/index": { "id": "routes/__index/index", "parentId": "routes/__index", "path": void 0, "index": true, "caseSensitive": void 0, "module": "/build/routes/__index/index-EVBKKG2Q.js", "imports": void 0, "hasAction": false, "hasLoader": false, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__index/login": { "id": "routes/__index/login", "parentId": "routes/__index", "path": "login", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__index/login-7FA557VV.js", "imports": ["/build/_shared/chunk-PGVZMUP7.js", "/build/_shared/chunk-Y5AGIVAF.js", "/build/_shared/chunk-EWMPTY72.js"], "hasAction": true, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__index/register": { "id": "routes/__index/register", "parentId": "routes/__index", "path": "register", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__index/register-QHRQPOMI.js", "imports": ["/build/_shared/chunk-PGVZMUP7.js", "/build/_shared/chunk-Y5AGIVAF.js", "/build/_shared/chunk-EWMPTY72.js"], "hasAction": true, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/api/auth.callback": { "id": "routes/api/auth.callback", "parentId": "root", "path": "api/auth/callback", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/api/auth.callback-3KKF7YE5.js", "imports": ["/build/_shared/chunk-Y5AGIVAF.js", "/build/_shared/chunk-J2TD3V3X.js", "/build/_shared/chunk-FO2FZAZ4.js"], "hasAction": true, "hasLoader": false, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/api/logout": { "id": "routes/api/logout", "parentId": "root", "path": "api/logout", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/api/logout-M6GZIMZO.js", "imports": ["/build/_shared/chunk-J2TD3V3X.js", "/build/_shared/chunk-FO2FZAZ4.js"], "hasAction": true, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false } }, "url": "/build/manifest-CB42023B.js" };
+var assets_manifest_default = { "version": "633e02c6", "entry": { "module": "/build/entry.client-BYM6EFLT.js", "imports": ["/build/_shared/chunk-3KBVUVEV.js", "/build/_shared/chunk-FN7GJDOI.js"] }, "routes": { "root": { "id": "root", "parentId": void 0, "path": "", "index": void 0, "caseSensitive": void 0, "module": "/build/root-PVGJWQEK.js", "imports": void 0, "hasAction": false, "hasLoader": true, "hasCatchBoundary": true, "hasErrorBoundary": true }, "routes/__authenticated": { "id": "routes/__authenticated", "parentId": "root", "path": void 0, "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__authenticated-42KQWPWI.js", "imports": ["/build/_shared/chunk-EWMPTY72.js"], "hasAction": false, "hasLoader": true, "hasCatchBoundary": true, "hasErrorBoundary": false }, "routes/__authenticated/budget/$month/$year": { "id": "routes/__authenticated/budget/$month/$year", "parentId": "routes/__authenticated", "path": "budget/:month/:year", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__authenticated/budget/$month/$year-IP7UKO4D.js", "imports": ["/build/_shared/chunk-FO2FZAZ4.js"], "hasAction": true, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__authenticated/categories/$budgetID": { "id": "routes/__authenticated/categories/$budgetID", "parentId": "routes/__authenticated", "path": "categories/:budgetID", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__authenticated/categories/$budgetID-ML7M554V.js", "imports": ["/build/_shared/chunk-HYLYUXP4.js"], "hasAction": true, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__authenticated/categories/delete/$categoryID/$budgetID": { "id": "routes/__authenticated/categories/delete/$categoryID/$budgetID", "parentId": "routes/__authenticated", "path": "categories/delete/:categoryID/:budgetID", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__authenticated/categories/delete/$categoryID/$budgetID-PMI5TRE6.js", "imports": void 0, "hasAction": true, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__authenticated/profile": { "id": "routes/__authenticated/profile", "parentId": "routes/__authenticated", "path": "profile", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__authenticated/profile-Y7R2MRSE.js", "imports": void 0, "hasAction": false, "hasLoader": false, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__authenticated/transactions.$categoryID": { "id": "routes/__authenticated/transactions.$categoryID", "parentId": "routes/__authenticated", "path": "transactions/:categoryID", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__authenticated/transactions.$categoryID-EKUZXSLF.js", "imports": ["/build/_shared/chunk-HYLYUXP4.js", "/build/_shared/chunk-FO2FZAZ4.js"], "hasAction": true, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__index": { "id": "routes/__index", "parentId": "root", "path": void 0, "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__index-S4WCJDOM.js", "imports": ["/build/_shared/chunk-J2TD3V3X.js", "/build/_shared/chunk-FO2FZAZ4.js"], "hasAction": false, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__index/index": { "id": "routes/__index/index", "parentId": "routes/__index", "path": void 0, "index": true, "caseSensitive": void 0, "module": "/build/routes/__index/index-EVBKKG2Q.js", "imports": void 0, "hasAction": false, "hasLoader": false, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__index/login": { "id": "routes/__index/login", "parentId": "routes/__index", "path": "login", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__index/login-7FA557VV.js", "imports": ["/build/_shared/chunk-PGVZMUP7.js", "/build/_shared/chunk-Y5AGIVAF.js", "/build/_shared/chunk-EWMPTY72.js"], "hasAction": true, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__index/register": { "id": "routes/__index/register", "parentId": "routes/__index", "path": "register", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__index/register-QHRQPOMI.js", "imports": ["/build/_shared/chunk-PGVZMUP7.js", "/build/_shared/chunk-Y5AGIVAF.js", "/build/_shared/chunk-EWMPTY72.js"], "hasAction": true, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/api/auth.callback": { "id": "routes/api/auth.callback", "parentId": "root", "path": "api/auth/callback", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/api/auth.callback-3KKF7YE5.js", "imports": ["/build/_shared/chunk-Y5AGIVAF.js", "/build/_shared/chunk-J2TD3V3X.js", "/build/_shared/chunk-FO2FZAZ4.js"], "hasAction": true, "hasLoader": false, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/api/logout": { "id": "routes/api/logout", "parentId": "root", "path": "api/logout", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/api/logout-M6GZIMZO.js", "imports": ["/build/_shared/chunk-J2TD3V3X.js", "/build/_shared/chunk-FO2FZAZ4.js"], "hasAction": true, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false } }, "url": "/build/manifest-633E02C6.js" };
 
 // server-entry-module:@remix-run/dev/server-build
 var entry = { module: entry_server_exports };
@@ -1202,6 +1322,14 @@ var routes = {
     index: void 0,
     caseSensitive: void 0,
     module: budgetID_exports
+  },
+  "routes/__authenticated/transactions.$categoryID": {
+    id: "routes/__authenticated/transactions.$categoryID",
+    parentId: "routes/__authenticated",
+    path: "transactions/:categoryID",
+    index: void 0,
+    caseSensitive: void 0,
+    module: transactions_categoryID_exports
   },
   "routes/__authenticated/categories/$budgetID": {
     id: "routes/__authenticated/categories/$budgetID",

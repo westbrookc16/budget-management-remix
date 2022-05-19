@@ -93,6 +93,7 @@ export default function Categories() {
         </td>
 
         <td>
+          <Link to={`/transactions/${id}`}>View Transactions</Link>
           <input
             type="hidden"
             id="id"
@@ -121,6 +122,7 @@ export default function Categories() {
               <th scope="col">Amount</th>
               <th scope="col">Update</th>
               <th scope="col">Delete</th>
+              <th scope="col">View Transactions</th>
             </tr>
           </thead>
           <tbody>{trs}</tbody>
