@@ -1,3 +1,46 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+  .btn-rose-700 {
+    @apply font-semibold py-1 px-4 bg-transparent text-rose-700 border-2 border-rose-700 hover:bg-rose-700 hover:text-white hover:shadow-md focus:bg-rose-700 focus:text-white focus:shadow-md rounded-md transition-all duration-200;
+  }
+
+  .btn-blue-700 {
+    @apply font-semibold py-1 px-4 bg-transparent text-blue-700 border-2 border-blue-700 hover:bg-blue-700 hover:text-white hover:shadow-md focus:bg-blue-700 focus:text-white focus:shadow-md rounded-md transition-all duration-200;
+  }
+
+  .btn-emerald-700 {
+    @apply font-semibold py-1 px-4 bg-transparent text-emerald-700 border-2 border-emerald-700 hover:bg-emerald-700 hover:text-white hover:shadow-md focus:bg-emerald-700 focus:text-white focus:shadow-md rounded-md transition-all duration-200;
+  }
+
+  h1 {
+    @apply text-blue-700 text-center text-2xl font-bold;
+  }
+
+  h2 {
+    @apply text-center text-xl font-semibold;
+  }
+
+  table {
+    @apply border-collapse border border-slate-300 bg-white shadow-sm table-auto;
+  }
+
+  table th {
+    @apply px-3 py-4 font-semibold border-b-2 border-blue-700 bg-gray-100;
+  }
+
+  table td {
+    @apply border-b border-gray-300 py-3 px-3;
+  }
+
+  label {
+    @apply font-semibold;
+  }
+
+  input,
+  select {
+    @apply border-2 border-blue-700 rounded-md px-2 py-1;
+  }
+}

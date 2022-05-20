@@ -1,3 +1,5 @@
+import { getUserByAccessToken } from "~/api/supabase-auth.server";
+import { authCookie } from "~/services/supabase.server";
 import { json } from "@remix-run/node";
 import {
   Link,
@@ -10,6 +12,8 @@ import {
   useCatch,
   useLoaderData,
 } from "@remix-run/react";
+
+import NavBar from "./components/NavBar";
 
 import styles from "./styles/app.css";
 
@@ -25,43 +29,48 @@ export function links() {
   return [{ rel: "stylesheet", href: styles }];
 }
 
-export function loader() {
+export async function loader({ request }) {
+  const authSession = await authCookie.getSession(
+    request.headers.get("Cookie")
+  );
+  const { user, error: getUserError } = await getUserByAccessToken(
+    authSession.get("access_token")
+  );
+
   return json({
     ENV: {
       SUPABASE_URL: process.env.SUPABASE_URL,
       SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY,
     },
+    user,
   });
 }
 
 function Layout({ children }) {
+  const { user } = useLoaderData();
   return (
-    <div className="px-5">
-      <div className="h-screen flex flex-col justify-between items-center">
-        {children}
-        <footer>
-          <ul className="flex list-none p-0 gap-1">
-            <li>
-              <a
-                target="_blank"
-                rel="noopener noreferrer"
-                href="https://github.com/westbrookc16/budget-management-remix"
-              >
-                Github
-              </a>
-            </li>
-            <li>
-              <a
-                target="_blank"
-                rel="noopener noreferrer"
-                href="https://twitter.com/chriswestbrook"
-              >
-                Twitter
-              </a>
-            </li>
-          </ul>
-        </footer>
-      </div>
+    <div className="h-screen flex flex-col justify-between items-center">
+      <NavBar user={user} />
+      <div className="px-5">{children}</div>
+      <footer className="w-full flex place-content-center bg-rose-700 text-white py-6 gap-6">
+        <a
+          className="underline"
+          target="_blank"
+          rel="noopener noreferrer"
+          href="https://github.com/westbrookc16/budget-management-remix"
+        >
+          Github
+        </a>
+
+        <a
+          className="underline"
+          target="_blank"
+          rel="noopener noreferrer"
+          href="https://twitter.com/chriswestbrook"
+        >
+          Twitter
+        </a>
+      </footer>
     </div>
   );
 }

@@ -73,6 +73,7 @@ export default function Categories() {
             aria-label={name}
             defaultValue={amount}
             name="amount"
+            className="max-w-[120px] text-center"
           />
         </td>
 
@@ -82,18 +83,26 @@ export default function Categories() {
             type="submit"
             name="_action"
             value="update"
+            className="btn-blue-700"
           >
             Update
           </button>
         </td>
         <td>
-          <button form={`myForm-${id}`} name="_action" value="delete">
+          <button
+            className="btn-rose-700"
+            form={`myForm-${id}`}
+            name="_action"
+            value="delete"
+          >
             Delete
           </button>
         </td>
 
         <td>
-          <Link to={`/transactions/${id}`}>View Transactions</Link>
+          <Link className="btn-emerald-700" to={`/transactions/${id}`}>
+            View Transactions
+          </Link>
           <input
             type="hidden"
             id="id"
@@ -112,8 +121,8 @@ export default function Categories() {
     );
   });
   return (
-    <div>
-      <h1>{`Categories for ${month}/${year}`}</h1>
+    <div className="flex flex-col place-items-center">
+      <h1 className="mb-6">{`Categories for ${month}/${year}`}</h1>
       {categories?.length > 0 && (
         <table>
           <thead>
@@ -129,34 +138,62 @@ export default function Categories() {
         </table>
       )}
       {forms}
-      <h2>add New Category</h2>
-      <Form method="post">
-        <label htmlFor="name">Name</label>
-        <input type="text" name="name" id="name" />
 
-        <label htmlFor="amount">Amount</label>
-        <input type="text" name="amount" id="amount" />
-        <button
-          type="submit"
-          name="_action"
-          value="insert"
+      <div className="flex flex-col my-4 text-center">
+        <div className="text-lg font-medium text-blue-700">
+          Total income: {income}
+        </div>
+
+        <div className="text-lg font-medium text-rose-700">
+          Total Budgeted: {formatCurrency(totalBudgeted)}
+        </div>
+
+        <div
+          className="text-lg font-medium text-emerald-700"
           aria-live="polite"
-          disabled={transition.type !== "idle"}
+          role="alert"
         >
-          Add
-        </button>
-      </Form>
-      Total income: {income}
-      <br />
-      Total Budgeted: {formatCurrency(totalBudgeted)}
-      <div aria-live="polite" role="alert">
-        There is
-        {formatCurrency(
-          parseFloat(income.replace("$", "").replace(",", "")) - totalBudgeted
-        )}{" "}
-        left to budget.
+          {`There is ${formatCurrency(
+            parseFloat(income.replace("$", "").replace(",", "")) - totalBudgeted
+          )} left to budget.`}
+        </div>
       </div>
-      <Link to={`/budget/${budget.month}/${budget.year}`}>
+
+      <div className="flex flex-col place-items-center border-2 p-6 rounded-md border-emerald-700">
+        <h2 className="mb-4 text-emerald-700">Add New Category</h2>
+        <Form className="flex flex-col place-items-center" method="post">
+          <div className="flex items-center gap-x-6">
+            <div className="flex flex-col w-1/2">
+              <label className="mb-1" htmlFor="name">
+                Name
+              </label>
+              <input type="text" name="name" id="name" />
+            </div>
+            <div className="flex flex-col w-1/2">
+              <label className="mb-1" htmlFor="amount">
+                Amount
+              </label>
+              <input type="text" name="amount" id="amount" />
+            </div>
+          </div>
+
+          <button
+            className="btn-emerald-700 mt-6"
+            type="submit"
+            name="_action"
+            value="insert"
+            aria-live="polite"
+            disabled={transition.type !== "idle"}
+          >
+            Add
+          </button>
+        </Form>
+      </div>
+
+      <Link
+        className="btn-blue-700 mt-6"
+        to={`/budget/${budget.month}/${budget.year}`}
+      >
         Back To Budget Management
       </Link>
     </div>

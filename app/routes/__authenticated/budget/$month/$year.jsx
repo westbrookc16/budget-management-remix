@@ -124,76 +124,105 @@ export default function Budget() {
     }
   }, [errors]);
   return (
-    <div>
-      <Form method="post">
-        <label htmlFor="month">Month</label>
-        <select
-          defaultValue={month}
-          id="month"
-          name="month"
-          onChange={handleSelection}
+    <>
+      <h1 className="mb-6">Budget Managment</h1>
+      <div className="border-2 border-blue-700 rounded-lg p-8 flex flex-col place-items-center">
+        <Form
+          className="w-full flex flex-col place-items-center gap-y-4"
+          method="post"
         >
-          <option value="1">Jan</option>
-          <option value="2">Feb</option>
-          <option value="3">Mar</option>
-          <option value="4">Apr</option>
-          <option value="5">May</option>
-          <option value="6">Jun</option>
-          <option value="7">Jul</option>
-          <option value="8">Aug</option>
-          <option value="9">Sep</option>
-          <option value="10">Oct</option>
-          <option value="11">Nov</option>
-          <option value="12">Dec</option>
-        </select>
-        <br />
-        <label htmlFor="year">Year</label>
+          <input type="hidden" name="id" value={id} />
+          <input type="hidden" name="user_id" value={user_id} />
 
-        <select
-          id="year"
-          name="year"
-          defaultValue={year}
-          onChange={handleSelection}
-        >
-          <option>2022</option>
-          <option>2023</option>
-        </select>
+          <div className="flex w-full gap-x-6">
+            <div className="w-1/2 flex flex-col">
+              <label className="mb-1" htmlFor="month">
+                Month
+              </label>
+              <select
+                defaultValue={month}
+                id="month"
+                name="month"
+                onChange={handleSelection}
+                className=""
+              >
+                <option value="1">Jan</option>
+                <option value="2">Feb</option>
+                <option value="3">Mar</option>
+                <option value="4">Apr</option>
+                <option value="5">May</option>
+                <option value="6">Jun</option>
+                <option value="7">Jul</option>
+                <option value="8">Aug</option>
+                <option value="9">Sep</option>
+                <option value="10">Oct</option>
+                <option value="11">Nov</option>
+                <option value="12">Dec</option>
+              </select>
+            </div>
+            <div className="w-1/2 flex flex-col">
+              <label className="mb-1" htmlFor="year">
+                Year
+              </label>
 
-        <input type="hidden" name="id" value={id} />
-        <label htmlFor="income">Income</label>
-        <input
-          ref={incomeRef}
-          id="income"
-          type="text"
-          name="income"
-          readOnly={transition.state !== "idle"}
-          value={incomeTxt}
-          onChange={(e) => {
-            e.preventDefault();
-            setIncomeTxt(e.target.value);
-          }}
-          aria-describedby="incomeError"
-        />
+              <select
+                id="year"
+                name="year"
+                defaultValue={year}
+                onChange={handleSelection}
+                className=""
+              >
+                <option>2022</option>
+                <option>2023</option>
+              </select>
+            </div>
+          </div>
 
-        <span id="incomeError">{errors?.income}</span>
-        <button
-          type="submit"
-          _action="update"
-          disabled={transition.state !== "idle"}
-          aria-live="polite"
-        >
-          Update
-        </button>
-        <input type="hidden" name="user_id" value={user_id} />
-      </Form>
+          <div className="flex flex-col w-full">
+            <label className="mb-1" htmlFor="income">
+              Income
+            </label>
+            <input
+              ref={incomeRef}
+              id="income"
+              type="text"
+              name="income"
+              readOnly={transition.state !== "idle"}
+              value={incomeTxt}
+              onChange={(e) => {
+                e.preventDefault();
+                setIncomeTxt(e.target.value);
+              }}
+              aria-describedby="incomeError"
+              className=""
+            />
+          </div>
 
-      {id > 0 && <a href={`/categories/${id}`}>View/Edit Categories</a>}
-      {actionData?.success && (
-        <div role="alert">Budget Updated Successfully.</div>
-      )}
-      {actionData?.error && (
-        <div role="alert">An error occurred: {actionData?.error}</div>
-      )}
-    </div>
+          <span id="incomeError">{errors?.income}</span>
+
+          <button
+            type="submit"
+            _action="update"
+            disabled={transition.state !== "idle"}
+            aria-live="polite"
+            className="btn-emerald-700"
+          >
+            Update
+          </button>
+        </Form>
+
+        {id > 0 && (
+          <a className="mt-4 btn-blue-700" href={`/categories/${id}`}>
+            View/Edit Categories
+          </a>
+        )}
+        {actionData?.success && (
+          <div role="alert">Budget Updated Successfully.</div>
+        )}
+        {actionData?.error && (
+          <div role="alert">An error occurred: {actionData?.error}</div>
+        )}
+      </div>
+    </>
   );
 }

@@ -1,5 +1,4 @@
 import authenticated from "~/policies/authenticated.server";
-import { Form } from "@remix-run/react";
 import { json } from "@remix-run/node";
 import { Link, Outlet, useCatch } from "@remix-run/react";
 
@@ -19,28 +18,6 @@ export async function loader({ request }) {
 export default function BudgetManagementLayout() {
   return (
     <>
-      <header>
-        <ul style={{ display: "flex", listStyleType: "none", padding: 0 }}>
-          <li style={{ margin: 4 }}>
-            <Link to="/">Home</Link>
-          </li>
-
-          <li style={{ margin: 4 }}>
-            <Link
-              to={`/budget/${
-                new Date().getMonth() + 1
-              }/${new Date().getFullYear()}`}
-            >
-              Budget Management
-            </Link>
-          </li>
-          <li>
-            <Form method="post" action="/api/logout">
-              <button type="submit">Logout</button>
-            </Form>
-          </li>
-        </ul>
-      </header>
       <main>
         <Outlet />
       </main>

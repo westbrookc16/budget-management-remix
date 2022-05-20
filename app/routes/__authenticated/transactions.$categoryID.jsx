@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import {
   Link,
   useActionData,
@@ -11,6 +12,7 @@ import { getAccessToken } from "~/policies/authenticated.server";
 import authenticated from "~/policies/authenticated.server";
 import { supabaseAdmin } from "~/services/supabase.server";
 import { json, redirect } from "@remix-run/node";
+
 export function meta() {
   return { title: "Budget Management|Transactions" };
 }
@@ -49,7 +51,7 @@ export async function action({ request, params }) {
           })
           .match({ id });
       }
-      return null;
+      return { success: true };
     },
     () => {
       throw new Response("unauthorized", { status: 401 });
@@ -119,7 +121,20 @@ export default function Transactions() {
     return <Form id={`transactions-${id}`} method="post" key={id} />;
   });
   const transition = useTransition();
-  const { error, errors } = useActionData() || {};
+  let { success, error, errors } = useActionData() || {};
+  const [successfulReturn, setSuccessfulReturn] = useState(false);
+  console.log(`success=${success}`);
+  useEffect(() => {
+    console.log(`in effect`);
+    if (success) {
+      setSuccessfulReturn(true);
+      console.log(`success`);
+      success = false;
+      setTimeout(() => {
+        setSuccessfulReturn(false);
+      }, 5000);
+    }
+  }, [success]);
   return (
     <div>
       <h1>Transactions for {category.name}</h1>
@@ -152,6 +167,9 @@ export default function Transactions() {
         <div role="alert">
           An error occurred. Please check your data and try again.
         </div>
+      )}
+      {successfulReturn && (
+        <div role="alert">Transaction Added Successfully.</div>
       )}
       <h2>Current Transactions</h2>
       <table>
