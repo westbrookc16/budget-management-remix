@@ -36,7 +36,7 @@ export async function loader({ request }) {
   const { user, error: getUserError } = await getUserByAccessToken(
     authSession.get("access_token")
   );
-
+  console.log(getUserError);
   return json({
     ENV: {
       SUPABASE_URL: process.env.SUPABASE_URL,

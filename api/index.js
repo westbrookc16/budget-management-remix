@@ -296,7 +296,7 @@ function NavBar({ user }) {
 }
 
 // app/styles/app.css
-var app_default = "/build/_assets/app-4ID2B3HX.css";
+var app_default = "/build/_assets/app-V2MIUNBG.css";
 
 // route:c:\dev\budget-management-remix\app\root.jsx
 function meta() {
@@ -311,6 +311,7 @@ function links() {
 async function loader({ request }) {
   const authSession = await authCookie.getSession(request.headers.get("Cookie"));
   const { user, error: getUserError } = await getUserByAccessToken(authSession.get("access_token"));
+  console.log(getUserError);
   return (0, import_node2.json)({
     ENV: {
       SUPABASE_URL: process.env.SUPABASE_URL,
@@ -616,13 +617,14 @@ async function action3({ request, params }) {
         transaction_date,
         category_id: params.categoryID
       });
-    } else if (_action === "update") {
+      return { insertSuccess: true };
+    } else if (_action === "Update") {
       const { error } = await supabaseAdmin.from("transactions").update({
         transaction_date,
         amount
       }).match({ id });
+      return { updateSuccess: true };
     }
-    return { success: true };
   }, () => {
     throw new Response("unauthorized", { status: 401 });
   });
@@ -654,12 +656,17 @@ function Transactions() {
       type: "submit",
       name: "_action",
       form: `transactions-${id}`,
-      value: "update"
+      value: "Update"
     }), /* @__PURE__ */ React.createElement("input", {
       type: "hidden",
       form: `transactions-${id}`,
       value: id,
       name: "id"
+    })), /* @__PURE__ */ React.createElement("td", null, /* @__PURE__ */ React.createElement("input", {
+      type: "submit",
+      name: "_action",
+      form: `transactions-${id}`,
+      value: "Delete"
     })));
   });
   const forms = transactions.map((t) => {
@@ -671,20 +678,7 @@ function Transactions() {
     });
   });
   const transition = (0, import_react9.useTransition)();
-  let { success, error, errors } = (0, import_react9.useActionData)() || {};
-  const [successfulReturn, setSuccessfulReturn] = (0, import_react8.useState)(false);
-  console.log(`success=${success}`);
-  (0, import_react8.useEffect)(() => {
-    console.log(`in effect`);
-    if (success) {
-      setSuccessfulReturn(true);
-      console.log(`success`);
-      success = false;
-      setTimeout(() => {
-        setSuccessfulReturn(false);
-      }, 5e3);
-    }
-  }, [success]);
+  let { updateSuccess, insertSuccess, error, errors } = (0, import_react9.useActionData)() || {};
   return /* @__PURE__ */ React.createElement("div", null, /* @__PURE__ */ React.createElement("h1", null, "Transactions for ", category.name), /* @__PURE__ */ React.createElement(import_react10.Form, {
     method: "post"
   }, /* @__PURE__ */ React.createElement("label", {
@@ -715,10 +709,12 @@ function Transactions() {
   }, errors == null ? void 0 : errors.amount), /* @__PURE__ */ React.createElement("button", {
     type: "submit",
     name: "_action",
-    value: "insert"
+    value: "insert",
+    disabled: transition.state !== "idle",
+    "aria-live": "polite"
   }, "Add")), (errors && Object.keys(errors).length > 0 || (error == null ? void 0 : error.message)) && /* @__PURE__ */ React.createElement("div", {
     role: "alert"
-  }, "An error occurred. Please check your data and try again."), successfulReturn && /* @__PURE__ */ React.createElement("div", {
+  }, "An error occurred. Please check your data and try again."), insertSuccess && transition.state === "idle" && /* @__PURE__ */ React.createElement("div", {
     role: "alert"
   }, "Transaction Added Successfully."), /* @__PURE__ */ React.createElement("h2", null, "Current Transactions"), /* @__PURE__ */ React.createElement("table", null, /* @__PURE__ */ React.createElement("thead", null, /* @__PURE__ */ React.createElement("tr", null, /* @__PURE__ */ React.createElement("th", {
     scope: "col"
@@ -728,7 +724,11 @@ function Transactions() {
     scope: "col"
   }, "Amount"), /* @__PURE__ */ React.createElement("th", {
     scope: "col"
-  }, "Update"))), /* @__PURE__ */ React.createElement("tbody", null, trs)), forms);
+  }, "Update"), /* @__PURE__ */ React.createElement("th", {
+    scope: "col"
+  }, "Delete"))), /* @__PURE__ */ React.createElement("tbody", null, trs)), updateSuccess && transition.state === "idle" && /* @__PURE__ */ React.createElement("div", {
+    role: "alert"
+  }, "Transaction updated Successfully."), forms);
 }
 
 // route:c:\dev\budget-management-remix\app\routes\__authenticated\categories\$budgetID.jsx
@@ -866,7 +866,8 @@ function Categories() {
   }, "Name"), /* @__PURE__ */ React.createElement("input", {
     type: "text",
     name: "name",
-    id: "name"
+    id: "name",
+    required: true
   })), /* @__PURE__ */ React.createElement("div", {
     className: "flex flex-col w-1/2"
   }, /* @__PURE__ */ React.createElement("label", {
@@ -875,7 +876,8 @@ function Categories() {
   }, "Amount"), /* @__PURE__ */ React.createElement("input", {
     type: "text",
     name: "amount",
-    id: "amount"
+    id: "amount",
+    required: true
   }))), /* @__PURE__ */ React.createElement("button", {
     className: "btn-emerald-700 mt-6",
     type: "submit",
@@ -1380,7 +1382,7 @@ function Login() {
 
 // server-assets-manifest:@remix-run/dev/assets-manifest
 init_react();
-var assets_manifest_default = { "version": "13059c49", "entry": { "module": "/build/entry.client-KNMCGL2B.js", "imports": ["/build/_shared/chunk-XR5MSAS2.js", "/build/_shared/chunk-FN7GJDOI.js"] }, "routes": { "root": { "id": "root", "parentId": void 0, "path": "", "index": void 0, "caseSensitive": void 0, "module": "/build/root-AQTF4FRA.js", "imports": ["/build/_shared/chunk-J2TD3V3X.js", "/build/_shared/chunk-FO2FZAZ4.js"], "hasAction": false, "hasLoader": true, "hasCatchBoundary": true, "hasErrorBoundary": true }, "routes/__authenticated": { "id": "routes/__authenticated", "parentId": "root", "path": void 0, "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__authenticated-DE2M3ZVA.js", "imports": ["/build/_shared/chunk-EWMPTY72.js"], "hasAction": false, "hasLoader": true, "hasCatchBoundary": true, "hasErrorBoundary": false }, "routes/__authenticated/budget/$month/$year": { "id": "routes/__authenticated/budget/$month/$year", "parentId": "routes/__authenticated", "path": "budget/:month/:year", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__authenticated/budget/$month/$year-AUBP6L5K.js", "imports": ["/build/_shared/chunk-FO2FZAZ4.js"], "hasAction": true, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__authenticated/categories/$budgetID": { "id": "routes/__authenticated/categories/$budgetID", "parentId": "routes/__authenticated", "path": "categories/:budgetID", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__authenticated/categories/$budgetID-F4XFNB7H.js", "imports": ["/build/_shared/chunk-HYLYUXP4.js"], "hasAction": true, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__authenticated/categories/delete/$categoryID/$budgetID": { "id": "routes/__authenticated/categories/delete/$categoryID/$budgetID", "parentId": "routes/__authenticated", "path": "categories/delete/:categoryID/:budgetID", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__authenticated/categories/delete/$categoryID/$budgetID-MU2FJFYD.js", "imports": void 0, "hasAction": true, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__authenticated/profile": { "id": "routes/__authenticated/profile", "parentId": "routes/__authenticated", "path": "profile", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__authenticated/profile-7QFAHECC.js", "imports": void 0, "hasAction": false, "hasLoader": false, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__authenticated/transactions.$categoryID": { "id": "routes/__authenticated/transactions.$categoryID", "parentId": "routes/__authenticated", "path": "transactions/:categoryID", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__authenticated/transactions.$categoryID-LVM7ZTXP.js", "imports": ["/build/_shared/chunk-HYLYUXP4.js", "/build/_shared/chunk-FO2FZAZ4.js"], "hasAction": true, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__index": { "id": "routes/__index", "parentId": "root", "path": void 0, "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__index-6WX5AARS.js", "imports": void 0, "hasAction": false, "hasLoader": false, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__index/index": { "id": "routes/__index/index", "parentId": "routes/__index", "path": void 0, "index": true, "caseSensitive": void 0, "module": "/build/routes/__index/index-EVBKKG2Q.js", "imports": void 0, "hasAction": false, "hasLoader": false, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__index/login": { "id": "routes/__index/login", "parentId": "routes/__index", "path": "login", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__index/login-ZDGM2NEX.js", "imports": ["/build/_shared/chunk-PGVZMUP7.js", "/build/_shared/chunk-Y5AGIVAF.js", "/build/_shared/chunk-J2TD3V3X.js", "/build/_shared/chunk-FO2FZAZ4.js", "/build/_shared/chunk-EWMPTY72.js"], "hasAction": true, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__index/register": { "id": "routes/__index/register", "parentId": "routes/__index", "path": "register", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__index/register-BZJXIV2C.js", "imports": ["/build/_shared/chunk-PGVZMUP7.js", "/build/_shared/chunk-Y5AGIVAF.js", "/build/_shared/chunk-J2TD3V3X.js", "/build/_shared/chunk-EWMPTY72.js"], "hasAction": true, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/api/auth.callback": { "id": "routes/api/auth.callback", "parentId": "root", "path": "api/auth/callback", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/api/auth.callback-LP55ZM54.js", "imports": ["/build/_shared/chunk-Y5AGIVAF.js"], "hasAction": true, "hasLoader": false, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/api/logout": { "id": "routes/api/logout", "parentId": "root", "path": "api/logout", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/api/logout-M6GZIMZO.js", "imports": void 0, "hasAction": true, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false } }, "url": "/build/manifest-13059C49.js" };
+var assets_manifest_default = { "version": "7e3fab5c", "entry": { "module": "/build/entry.client-J2NXOGZQ.js", "imports": ["/build/_shared/chunk-5RT2J2YK.js", "/build/_shared/chunk-FN7GJDOI.js"] }, "routes": { "root": { "id": "root", "parentId": void 0, "path": "", "index": void 0, "caseSensitive": void 0, "module": "/build/root-36XKYKJ5.js", "imports": ["/build/_shared/chunk-J2TD3V3X.js", "/build/_shared/chunk-FO2FZAZ4.js"], "hasAction": false, "hasLoader": true, "hasCatchBoundary": true, "hasErrorBoundary": true }, "routes/__authenticated": { "id": "routes/__authenticated", "parentId": "root", "path": void 0, "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__authenticated-TZF3YL56.js", "imports": ["/build/_shared/chunk-EWMPTY72.js"], "hasAction": false, "hasLoader": true, "hasCatchBoundary": true, "hasErrorBoundary": false }, "routes/__authenticated/budget/$month/$year": { "id": "routes/__authenticated/budget/$month/$year", "parentId": "routes/__authenticated", "path": "budget/:month/:year", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__authenticated/budget/$month/$year-3US22IMK.js", "imports": ["/build/_shared/chunk-FO2FZAZ4.js"], "hasAction": true, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__authenticated/categories/$budgetID": { "id": "routes/__authenticated/categories/$budgetID", "parentId": "routes/__authenticated", "path": "categories/:budgetID", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__authenticated/categories/$budgetID-ETRP3DK5.js", "imports": ["/build/_shared/chunk-HYLYUXP4.js"], "hasAction": true, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__authenticated/categories/delete/$categoryID/$budgetID": { "id": "routes/__authenticated/categories/delete/$categoryID/$budgetID", "parentId": "routes/__authenticated", "path": "categories/delete/:categoryID/:budgetID", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__authenticated/categories/delete/$categoryID/$budgetID-PWSMQBIR.js", "imports": void 0, "hasAction": true, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__authenticated/profile": { "id": "routes/__authenticated/profile", "parentId": "routes/__authenticated", "path": "profile", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__authenticated/profile-3JLEENTS.js", "imports": void 0, "hasAction": false, "hasLoader": false, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__authenticated/transactions.$categoryID": { "id": "routes/__authenticated/transactions.$categoryID", "parentId": "routes/__authenticated", "path": "transactions/:categoryID", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__authenticated/transactions.$categoryID-CTWR5RM5.js", "imports": ["/build/_shared/chunk-HYLYUXP4.js", "/build/_shared/chunk-FO2FZAZ4.js"], "hasAction": true, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__index": { "id": "routes/__index", "parentId": "root", "path": void 0, "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__index-NGKPO7D3.js", "imports": void 0, "hasAction": false, "hasLoader": false, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__index/index": { "id": "routes/__index/index", "parentId": "routes/__index", "path": void 0, "index": true, "caseSensitive": void 0, "module": "/build/routes/__index/index-EVBKKG2Q.js", "imports": void 0, "hasAction": false, "hasLoader": false, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__index/login": { "id": "routes/__index/login", "parentId": "routes/__index", "path": "login", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__index/login-6ZFSQDEK.js", "imports": ["/build/_shared/chunk-PGVZMUP7.js", "/build/_shared/chunk-Y5AGIVAF.js", "/build/_shared/chunk-J2TD3V3X.js", "/build/_shared/chunk-FO2FZAZ4.js", "/build/_shared/chunk-EWMPTY72.js"], "hasAction": true, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/__index/register": { "id": "routes/__index/register", "parentId": "routes/__index", "path": "register", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/__index/register-UZ7OMJKQ.js", "imports": ["/build/_shared/chunk-PGVZMUP7.js", "/build/_shared/chunk-Y5AGIVAF.js", "/build/_shared/chunk-J2TD3V3X.js", "/build/_shared/chunk-EWMPTY72.js"], "hasAction": true, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/api/auth.callback": { "id": "routes/api/auth.callback", "parentId": "root", "path": "api/auth/callback", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/api/auth.callback-UIEDQJFI.js", "imports": ["/build/_shared/chunk-Y5AGIVAF.js"], "hasAction": true, "hasLoader": false, "hasCatchBoundary": false, "hasErrorBoundary": false }, "routes/api/logout": { "id": "routes/api/logout", "parentId": "root", "path": "api/logout", "index": void 0, "caseSensitive": void 0, "module": "/build/routes/api/logout-M6GZIMZO.js", "imports": void 0, "hasAction": true, "hasLoader": true, "hasCatchBoundary": false, "hasErrorBoundary": false } }, "url": "/build/manifest-7E3FAB5C.js" };
 
 // server-entry-module:@remix-run/dev/server-build
 var entry = { module: entry_server_exports };

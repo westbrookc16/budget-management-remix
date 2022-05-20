@@ -42,7 +42,8 @@ export async function action({ request, params }) {
           transaction_date,
           category_id: params.categoryID,
         });
-      } else if (_action === "update") {
+        return { insertSuccess: true };
+      } else if (_action === "Update") {
         const { error } = await supabaseAdmin
           .from("transactions")
           .update({
@@ -50,8 +51,8 @@ export async function action({ request, params }) {
             amount,
           })
           .match({ id });
+        return { updateSuccess: true };
       }
-      return { success: true };
     },
     () => {
       throw new Response("unauthorized", { status: 401 });
@@ -88,7 +89,6 @@ export default function Transactions() {
             defaultValue={transaction_date}
           />
         </td>
-
         <td>
           <input
             type="text"
@@ -98,19 +98,26 @@ export default function Transactions() {
             defaultValue={amount}
           />
         </td>
-
         <td>
           <input
             type="submit"
             name="_action"
             form={`transactions-${id}`}
-            value="update"
+            value="Update"
           />
           <input
             type="hidden"
             form={`transactions-${id}`}
             value={id}
             name="id"
+          />
+        </td>
+        <td>
+          <input
+            type="submit"
+            name="_action"
+            form={`transactions-${id}`}
+            value="Delete"
           />
         </td>
       </tr>
@@ -121,20 +128,8 @@ export default function Transactions() {
     return <Form id={`transactions-${id}`} method="post" key={id} />;
   });
   const transition = useTransition();
-  let { success, error, errors } = useActionData() || {};
-  const [successfulReturn, setSuccessfulReturn] = useState(false);
-  console.log(`success=${success}`);
-  useEffect(() => {
-    console.log(`in effect`);
-    if (success) {
-      setSuccessfulReturn(true);
-      console.log(`success`);
-      success = false;
-      setTimeout(() => {
-        setSuccessfulReturn(false);
-      }, 5000);
-    }
-  }, [success]);
+  let { updateSuccess, insertSuccess, error, errors } = useActionData() || {};
+
   return (
     <div>
       <h1>Transactions for {category.name}</h1>
@@ -159,7 +154,13 @@ export default function Transactions() {
           aria-describedby="errorAmount"
         />
         {errors?.amount && <span id="errorAmount">{errors?.amount}</span>}
-        <button type="submit" name="_action" value="insert">
+        <button
+          type="submit"
+          name="_action"
+          value="insert"
+          disabled={transition.state !== "idle"}
+          aria-live="polite"
+        >
           Add
         </button>
       </Form>
@@ -168,7 +169,7 @@ export default function Transactions() {
           An error occurred. Please check your data and try again.
         </div>
       )}
-      {successfulReturn && (
+      {insertSuccess && transition.state === "idle" && (
         <div role="alert">Transaction Added Successfully.</div>
       )}
       <h2>Current Transactions</h2>
@@ -179,10 +180,15 @@ export default function Transactions() {
             <th scope="col">Date</th>
             <th scope="col">Amount</th>
             <th scope="col">Update</th>
+            <th scope="col">Delete</th>
           </tr>
         </thead>
         <tbody>{trs}</tbody>
       </table>
+
+      {updateSuccess && transition.state === "idle" && (
+        <div role="alert">Transaction updated Successfully.</div>
+      )}
       {forms}
     </div>
   );

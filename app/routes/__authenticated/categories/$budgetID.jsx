@@ -167,13 +167,13 @@ export default function Categories() {
               <label className="mb-1" htmlFor="name">
                 Name
               </label>
-              <input type="text" name="name" id="name" />
+              <input type="text" name="name" id="name" required />
             </div>
             <div className="flex flex-col w-1/2">
               <label className="mb-1" htmlFor="amount">
                 Amount
               </label>
-              <input type="text" name="amount" id="amount" />
+              <input type="text" name="amount" id="amount" required />
             </div>
           </div>
 
