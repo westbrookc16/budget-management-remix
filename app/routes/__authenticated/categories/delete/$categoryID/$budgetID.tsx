@@ -1,24 +1,26 @@
+import { json } from "@remix-run/node";
+import type { ActionFunction, LoaderFunction } from "@remix-run/node";
 import { redirect } from "@remix-run/node";
-import authenticated from "../../../../../policies/authenticated.server";
-import { supabaseAdmin } from "../../../../../services/supabase.server";
+import authenticated from "~/policies/authenticated.server";
+import { supabaseAdmin } from "~/services/supabase.server";
 import { useLoaderData, Form } from "@remix-run/react";
-export async function loader({ request, params }) {
+export const loader: LoaderFunction = async ({ request, params }) => {
   const { data: category } = await supabaseAdmin
     .from("categories")
     .select()
     .match({ id: params.categoryID })
     .limit(1)
     .single();
-  return { category };
-}
-export function action({ request, params }) {
+  return json({ category });
+};
+export const action: ActionFunction = async ({ request, params }) => {
   return authenticated(
     request,
     async () => {
       const data = await request.formData();
       const _action = data.get("_action");
       if (_action === "delete") {
-        const { error } = await supabaseAdmin
+        await supabaseAdmin
           .from("categories")
           .delete()
           .match({ id: params.categoryID });
@@ -32,7 +34,7 @@ export function action({ request, params }) {
       throw new Response("unauthorized", { status: 401 });
     }
   );
-}
+};
 export default function DeleteCategory() {
   const { category } = useLoaderData();
   const { name } = category;

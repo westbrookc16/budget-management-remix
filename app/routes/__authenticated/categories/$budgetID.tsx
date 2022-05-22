@@ -1,14 +1,26 @@
-import { Link, useLoaderData, useTransition } from "@remix-run/react";
+import type {
+  ActionFunction,
+  LoaderFunction,
+  MetaFunction,
+} from "@remix-run/node";
+import type { definitions } from "~/types/supabase";
+import {
+  Link,
+  useActionData,
+  useLoaderData,
+  useTransition,
+} from "@remix-run/react";
 import { formatCurrency } from "~/utils/currency";
 import { Form } from "@remix-run/react";
 import { getAccessToken } from "~/policies/authenticated.server";
 import authenticated from "~/policies/authenticated.server";
 import { supabaseAdmin } from "../../../services/supabase.server";
 import { json, redirect } from "@remix-run/node";
-export function meta() {
+export const meta: MetaFunction = () => {
   return { title: "Budget Management|Categories" };
-}
-export async function action({ request, params }) {
+};
+type ActionData = { formMessage: string };
+export const action: ActionFunction = async ({ request, params }) => {
   return authenticated(
     request,
     async (user) => {
@@ -22,6 +34,18 @@ export async function action({ request, params }) {
       if (_action === "delete") {
         return redirect(`/categories/delete/${id}/${params.budgetID}`);
       }
+      const returnData: ActionData = {
+        formMessage: "Your form was submitted successfully.",
+      };
+      if (
+        Number.isNaN(
+          Number(amount?.toString().replace("$", "").replace(",", ""))
+        )
+      ) {
+        returnData.formMessage =
+          "Your form was not submitted successfully. Make sure your amount is a number.";
+        return json(returnData);
+      }
       if (_action === "insert") {
         await supabaseAdmin
           .from("categories")
@@ -29,27 +53,27 @@ export async function action({ request, params }) {
       } else if (_action === "update") {
         await supabaseAdmin.from("categories").update({ amount }).match({ id });
       }
-      return null;
+      return json(returnData);
     },
     () => {
       throw new Response("unauthorized", { status: 401 });
     }
   );
-}
-export async function loader({ request, params }) {
+};
+export const loader: LoaderFunction = async ({ request, params }) => {
   supabaseAdmin.auth.setAuth(await getAccessToken(request));
   const { budgetID } = params;
 
   let { data: categories } = await supabaseAdmin
-    .from("categories")
+    .from<definitions["categories"]>("categories")
     .select()
     .match({ budget_id: budgetID });
-  const totalBudgeted = categories.reduce((p, c) => {
-    return (
-      parseFloat(p) + parseFloat(c.amount.replace("$", "").replace(",", ""))
-    );
+  const totalBudgeted = categories?.reduce((p: number | undefined, c) => {
+    if (p === undefined || c === undefined) return 0;
+    if (c.amount === undefined) return 0;
+    return p + parseFloat(c.amount.replace("$", "").replace(",", ""));
   }, 0);
-  let { data: budget, error } = await supabaseAdmin
+  let { data: budget } = await supabaseAdmin
     .from("budgets")
     .select()
     .match({ id: budgetID })
@@ -57,12 +81,12 @@ export async function loader({ request, params }) {
     .single();
 
   return json({ budget, categories, totalBudgeted });
-}
+};
 export default function Categories() {
   const { budget, categories, totalBudgeted } = useLoaderData();
   const { month, year, income } = budget;
   const transition = useTransition();
-  const trs = categories.map((cat) => {
+  const trs = categories.map((cat: definitions["categories"]) => {
     const { name, amount, id } = cat;
     return (
       <tr key={id}>
@@ -114,12 +138,15 @@ export default function Categories() {
       </tr>
     );
   });
-  const forms = categories.map((cat) => {
+  const forms = categories.map((cat: definitions["categories"]) => {
     const { id } = cat;
     return (
       <Form key={id} id={`myForm-${id}`} name={`myForm-${id}`} method="post" />
     );
   });
+  const actionData = useActionData();
+  const { formMessage } = actionData || {};
+  //const transition = useTransition();
   return (
     <div className="flex flex-col place-items-center">
       <h1 className="mb-6">{`Categories for ${month}/${year}`}</h1>
@@ -189,7 +216,9 @@ export default function Categories() {
           </button>
         </Form>
       </div>
-
+      {formMessage && transition.state === "idle" && (
+        <div role="alert">{formMessage}</div>
+      )}
       <Link
         className="btn-blue-700 mt-6"
         to={`/budget/${budget.month}/${budget.year}`}

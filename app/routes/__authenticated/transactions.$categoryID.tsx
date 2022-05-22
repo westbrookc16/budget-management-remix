@@ -1,22 +1,37 @@
-import { useState, useEffect } from "react";
-import {
-  Link,
-  useActionData,
-  useLoaderData,
-  useTransition,
-} from "@remix-run/react";
+import type { ActionFunction, LoaderFunction } from "@remix-run/node";
+import { redirect } from "@remix-run/node";
+
+import { useActionData, useLoaderData, useTransition } from "@remix-run/react";
 import { isValidDate } from "~/utils/date";
-import { formatCurrency } from "~/utils/currency";
+
 import { Form } from "@remix-run/react";
 import { getAccessToken } from "~/policies/authenticated.server";
 import authenticated from "~/policies/authenticated.server";
 import { supabaseAdmin } from "~/services/supabase.server";
-import { json, redirect } from "@remix-run/node";
+import { json } from "@remix-run/node";
+import type { definitions } from "~/types/supabase";
 
 export function meta() {
   return { title: "Budget Management|Transactions" };
 }
-export async function action({ request, params }) {
+type ActionData = {
+  formMessage: String;
+  fieldErrors?: {
+    transaction_date: string | undefined;
+    amount: String | undefined;
+  };
+};
+const validateAmount = (amount: FormDataEntryValue | null) => {
+  if (
+    amount !== null &&
+    Number.isNaN(Number(amount.toString().replace("$", "").replace(",", "")))
+  )
+    return "You must enter a number.";
+};
+const validateTransaction_date = (transaction_date: String | undefined) => {
+  if (!isValidDate(transaction_date)) return "You must enter a valid date.";
+};
+export const action: ActionFunction = async ({ request, params }) => {
   return authenticated(
     request,
     async () => {
@@ -27,55 +42,64 @@ export async function action({ request, params }) {
       const amount = transaction.get("amount");
       const transaction_date = transaction.get("transaction_date");
       const _action = transaction.get("_action");
-      const errors = {};
-      if (!isValidDate(transaction_date)) {
-        errors.transaction_date = "You must enter a valid date.";
-      }
-      if (isNaN(amount.replace("$", "").replace(",", ""))) {
-        errors.amount = "You must enter a valid amount.";
-      }
-      if (Object.keys(errors).length > 0) return { errors };
-      if (_action === "insert") {
+      const errors: ActionData = {
+        formMessage: "Your form was submitted successfully.",
+      };
+
+      const fieldErrors = {
+        amount: validateAmount(amount),
+        transaction_date: validateTransaction_date(
+          transaction_date?.toString()
+        ),
+      };
+      if (Object.values(fieldErrors).some(Boolean)) {
+        errors.fieldErrors = fieldErrors;
+        errors.formMessage = "Your form was not submitted successfully.";
+        return json(errors, { status: 400 });
+      } else if (_action === "insert") {
         await supabaseAdmin.from("transactions").insert({
           name,
           amount,
           transaction_date,
           category_id: params.categoryID,
         });
-        return { insertSuccess: true };
+        errors.formMessage = "Your transaction was added successfully.";
       } else if (_action === "Update") {
-        const { error } = await supabaseAdmin
+        await supabaseAdmin
           .from("transactions")
           .update({
             transaction_date,
             amount,
           })
           .match({ id });
-        return { updateSuccess: true };
+        errors.formMessage = "Your transaction was updated successfully.";
+      } else if (_action === "Delete") {
+        return redirect(`/transactions/delete/${id}/${params.categoryID}`);
       }
+      return json(errors);
     },
     () => {
       throw new Response("unauthorized", { status: 401 });
     }
   );
-}
-export async function loader({ request, params }) {
+};
+export const loader: LoaderFunction = async ({ request, params }) => {
   const { data: category } = await supabaseAdmin
     .from("categories")
     .select()
     .match({ id: params.categoryID })
     .limit(1)
     .single();
-  const { data: transactions, error } = await supabaseAdmin
+  const { data: transactions } = await supabaseAdmin
     .from("vw_transactions")
     .select()
     .match({ category_id: params.categoryID });
 
   return json({ category, transactions });
-}
+};
 export default function Transactions() {
   const { transactions, category } = useLoaderData();
-  const trs = transactions.map((t) => {
+  const trs = transactions.map((t: definitions["transactions"]) => {
     const { id, name, transaction_date, amount } = t;
     return (
       <tr key={id}>
@@ -123,12 +147,12 @@ export default function Transactions() {
       </tr>
     );
   });
-  const forms = transactions.map((t) => {
+  const forms = transactions.map((t: definitions["transactions"]) => {
     const { id } = t;
     return <Form id={`transactions-${id}`} method="post" key={id} />;
   });
   const transition = useTransition();
-  let { updateSuccess, insertSuccess, error, errors } = useActionData() || {};
+  const data = useActionData<ActionData>();
 
   return (
     <div>
@@ -143,8 +167,10 @@ export default function Transactions() {
           id="transaction_date"
           aria-describedby="errorTransaction_date"
         />
-        {errors?.transaction_date && (
-          <span id="errorTransaction_date">{errors?.transaction_date}</span>
+        {data?.fieldErrors?.transaction_date && (
+          <span id="errorTransaction_date">
+            {data?.fieldErrors?.transaction_date}
+          </span>
         )}
         <label htmlFor="amount">Amount</label>
         <input
@@ -153,7 +179,9 @@ export default function Transactions() {
           id="amount"
           aria-describedby="errorAmount"
         />
-        {errors?.amount && <span id="errorAmount">{errors?.amount}</span>}
+        {data?.fieldErrors?.amount && (
+          <span id="errorAmount">{data.fieldErrors.amount}</span>
+        )}
         <button
           type="submit"
           name="_action"
@@ -164,13 +192,9 @@ export default function Transactions() {
           Add
         </button>
       </Form>
-      {((errors && Object.keys(errors).length > 0) || error?.message) && (
-        <div role="alert">
-          An error occurred. Please check your data and try again.
-        </div>
-      )}
-      {insertSuccess && transition.state === "idle" && (
-        <div role="alert">Transaction Added Successfully.</div>
+
+      {data?.formMessage && transition.state === "idle" && (
+        <div role="alert">{data.formMessage}</div>
       )}
       <h2>Current Transactions</h2>
       <table>
@@ -186,9 +210,6 @@ export default function Transactions() {
         <tbody>{trs}</tbody>
       </table>
 
-      {updateSuccess && transition.state === "idle" && (
-        <div role="alert">Transaction updated Successfully.</div>
-      )}
       {forms}
     </div>
   );

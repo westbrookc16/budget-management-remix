@@ -1,3 +1,4 @@
+import type { ActionFunction, LoaderFunction } from "@remix-run/node";
 import { useMemo } from "react";
 
 import { loginUser, setAuthSession } from "~/api/supabase-auth.server";
@@ -12,7 +13,7 @@ export function meta() {
   return { title: "Budget Management| Login" };
 }
 
-export async function loader({ request }) {
+export const loader: LoaderFunction = async ({ request }) => {
   return authenticated(
     request,
     () => {
@@ -24,9 +25,9 @@ export async function loader({ request }) {
       return json({});
     }
   );
-}
+};
 
-export async function action({ request }) {
+export const action: ActionFunction = async ({ request }) => {
   let session = await authCookie.getSession(request.headers.get("Cookie"));
 
   const form = await request.formData();
@@ -69,7 +70,7 @@ export async function action({ request }) {
       "Set-Cookie": await authCookie.commitSession(session),
     },
   });
-}
+};
 
 export default function Login() {
   const actionData = useActionData();

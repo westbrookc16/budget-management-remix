@@ -1,4 +1,5 @@
 //import { json, redirect } from "@remix-run/node";
+import type { ActionFunction, LoaderFunction } from "@remix-run/node";
 import { Form, Link, useActionData } from "@remix-run/react";
 import { json, redirect } from "@remix-run/node";
 import { registerUser } from "~/api/supabase-auth.server";
@@ -9,7 +10,7 @@ export function meta() {
   return { title: "Budget Management| Register" };
 }
 
-export async function loader({ request }) {
+export const loader: LoaderFunction = async ({ request }) => {
   return authenticated(
     request,
     () => {
@@ -21,18 +22,22 @@ export async function loader({ request }) {
       return json({});
     }
   );
-}
+};
 
-export async function action({ request }) {
+export const action: ActionFunction = async ({ request }) => {
   const form = await request.formData();
   const email = form.get("email");
   const password = form.get("password");
+  const password2 = form.get("password2");
   if (
     !email ||
     !password ||
+    !password2 ||
     typeof email !== "string" ||
     typeof password !== "string" ||
-    password.length < 8
+    typeof password2 !== "string" ||
+    password.length < 8 ||
+    password !== password2
   ) {
     return json(
       {
@@ -57,7 +62,7 @@ export async function action({ request }) {
   }
 
   return json({ result: "success" }, { status: 201 });
-}
+};
 
 export default function Register() {
   const actionData = useActionData();
@@ -65,7 +70,7 @@ export default function Register() {
   return (
     <div>
       <h1>Register</h1>
-      <div style={{ margin: 5 }}>
+      <div>
         <AuthProviderBtn
           provider="google"
           redirectTo={`/budget/${
@@ -73,29 +78,30 @@ export default function Register() {
           }/${new Date().getFullYear()}`}
         />
       </div>
-      <div style={{ margin: 5 }}>
-        <AuthProviderBtn provider="facebook" />
-      </div>
+      <div style={{ margin: 5 }}></div>
       <p>Or continue with email/password</p>
       <Form replace method="post">
         <fieldset>
           <legend>Register</legend>
-          <div style={{ margin: 5 }}>
-            <label>
-              Email{" "}
-              <input
-                type="email"
-                name="email"
-                defaultValue={actionData?.fields?.email}
-              />
-            </label>
+          <div>
+            <label htmlFor="email">Email</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              defaultValue={actionData?.fields?.email}
+            />
           </div>
-          <div style={{ margin: 5 }}>
-            <label>
-              Password <input type="password" name="password" />
-            </label>
+          <div>
+            <label htmlFor="password">Password</label>
+            <input type="password" name="password" id="password" />
           </div>
-          <div style={{ margin: 5 }}>
+
+          <div>
+            <label htmlFor="password2">Retype Password</label>
+            <input type="password" name="password2" id="password2" />
+          </div>
+          <div>
             <button type="submit">Register</button>
           </div>
         </fieldset>
@@ -104,14 +110,16 @@ export default function Register() {
         Have an account? <Link to="/login">Login</Link> instead
       </p>
       {actionData?.formError ? (
-        <p style={{ color: "red" }}>{actionData.formError}</p>
+        <div role="alert" style={{ color: "red" }}>
+          {actionData.formError}
+        </div>
       ) : null}
       {actionData?.result ? (
-        <p style={{ color: "green" }}>
+        <div role="alert">
           We have sent you an email.
           <br />
           Please confirm your email to complete registration.
-        </p>
+        </div>
       ) : null}
     </div>
   );

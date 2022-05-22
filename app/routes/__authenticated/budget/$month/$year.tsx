@@ -150,13 +150,16 @@ export default function Budget() {
   };
   const incomeRef = useRef(null);
   useEffect(() => {
-    if (actionData?.errors?.fieldErrors?.income !== undefined) {
+    if (
+      actionData?.errors?.fieldErrors?.income !== undefined &&
+      transition.state === "idle"
+    ) {
       if (incomeRef.current !== null) {
         const i: HTMLInputElement = incomeRef.current as HTMLInputElement;
         i.focus();
       }
     }
-  }, [actionData?.errors]);
+  }, [actionData?.errors?.fieldErrors?.income, transition.state]);
   return (
     <>
       <h1 className="mb-6">Budget Managment</h1>
