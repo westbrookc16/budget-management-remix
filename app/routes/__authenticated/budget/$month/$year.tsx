@@ -23,9 +23,13 @@ type ActionData = {
   fieldErrors?: { income: string | undefined };
 };
 const validateIncome = (income: FormDataEntryValue | null) => {
+  console.log(
+    income,
+    income && Number.isNaN(income.toString().replace("$", "").replace(",", ""))
+  );
   if (
     income !== null &&
-    Number.isNaN(income.toString().replace("$", "").replace(",", ""))
+    Number.isNaN(Number(income.toString().replace("$", "").replace(",", "")))
   ) {
     console.log(income?.toString().replace("$", "").replace(",", ""));
     return "Your income must be a number";
@@ -50,7 +54,10 @@ export const action: ActionFunction = async ({ request }) => {
       const errors: ActionData = {
         formMessage: "Your form was not submitted successfully.",
       };
+      console.log("here");
       const fieldErrors = { income: validateIncome(income) };
+
+      console.log(fieldErrors);
 
       if (Object.values(fieldErrors).some(Boolean)) {
         errors.fieldErrors = fieldErrors;
@@ -116,7 +123,7 @@ export default function Budget() {
   const transition = useTransition();
   const { income, id, user_id, month, year } = useLoaderData();
   const actionData = useActionData();
-  const { fieldErrors: errors } = useActionData()?.errors || {};
+
   const [incomeTxt, setIncomeTxt] = useState("");
   useEffect(() => {
     setIncomeTxt(income);
@@ -143,13 +150,13 @@ export default function Budget() {
   };
   const incomeRef = useRef(null);
   useEffect(() => {
-    if (errors?.fieldErrors?.income !== undefined) {
+    if (actionData?.errors?.fieldErrors?.income !== undefined) {
       if (incomeRef.current !== null) {
         const i: HTMLInputElement = incomeRef.current as HTMLInputElement;
         i.focus();
       }
     }
-  }, [errors]);
+  }, [actionData?.errors]);
   return (
     <>
       <h1 className="mb-6">Budget Managment</h1>
@@ -225,7 +232,9 @@ export default function Budget() {
             />
           </div>
 
-          <span id="incomeError">{errors?.fieldErrors?.income}</span>
+          <span id="incomeError">
+            {actionData?.errors?.fieldErrors?.income}
+          </span>
 
           <button
             type="submit"
