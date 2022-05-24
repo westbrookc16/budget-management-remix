@@ -1,8 +1,8 @@
-import { useCallback } from 'react';
+import { useCallback } from "react";
 
-import { continueWithProvider } from '~/api/supabase-auth.client';
+import { continueWithProvider } from "~/api/supabase-auth.client";
 
-import type { Provider } from '@supabase/supabase-js';
+import type { Provider } from "@supabase/supabase-js";
 
 type AuthProviderBtnProps = {
   provider: Provider;
@@ -28,7 +28,13 @@ export default function AuthProviderBtn({
   }, [provider, redirectTo]);
 
   return (
-    <button {...props} onClick={handleOnClick}>
+    <button
+      {...props}
+      onClick={handleOnClick}
+      className="btn-slate-200 flex gap-x-2 items-center font-bold"
+      type="submit"
+    >
+      <img src="/google.svg" alt="" className="w-4 h-auto" />
       Continue with {provider}
     </button>
   );

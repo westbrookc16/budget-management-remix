@@ -35,7 +35,7 @@ export const action: ActionFunction = async ({ request, params }) => {
         return redirect(`/categories/delete/${id}/${params.budgetID}`);
       }
       const returnData: ActionData = {
-        formMessage: "Your form was submitted successfully.",
+        formMessage: "Your category was changed successfully.",
       };
       if (
         Number.isNaN(
@@ -43,13 +43,14 @@ export const action: ActionFunction = async ({ request, params }) => {
         )
       ) {
         returnData.formMessage =
-          "Your form was not submitted successfully. Make sure your amount is a number.";
+          "An error occurred. Make sure your amount is a number.";
         return json(returnData);
       }
       if (_action === "insert") {
         await supabaseAdmin
           .from("categories")
           .insert({ budget_id: budgetID, name, amount });
+        returnData.formMessage = "Your category was inserted successfully.";
       } else if (_action === "update") {
         await supabaseAdmin.from("categories").update({ amount }).match({ id });
       }
@@ -148,7 +149,7 @@ export default function Categories() {
   const { formMessage } = actionData || {};
   //const transition = useTransition();
   return (
-    <div className="flex flex-col place-items-center">
+    <div className="flex flex-col place-items-center py-7">
       <h1 className="mb-6">{`Categories for ${month}/${year}`}</h1>
       {categories?.length > 0 && (
         <table>
