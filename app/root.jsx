@@ -1,4 +1,3 @@
-import type { LoaderFunction } from "@remix-run/node";
 import { getUserByAccessToken } from "~/api/supabase-auth.server";
 import { authCookie } from "~/services/supabase.server";
 import { json } from "@remix-run/node";
@@ -30,7 +29,7 @@ export function links() {
   return [{ rel: "stylesheet", href: styles }];
 }
 
-export const loader: LoaderFunction = async ({ request }) => {
+export async function loader({ request }) {
   const authSession = await authCookie.getSession(
     request.headers.get("Cookie")
   );
@@ -45,9 +44,9 @@ export const loader: LoaderFunction = async ({ request }) => {
     },
     user,
   });
-};
+}
 
-function Layout({ children }: any) {
+function Layout({ children }) {
   const { user } = useLoaderData();
   return (
     <div className="h-screen flex flex-col justify-between items-center">
@@ -146,7 +145,7 @@ export function CatchBoundary() {
   );
 }
 
-export function ErrorBoundary({ error }: any) {
+export function ErrorBoundary({ error }) {
   return (
     <Layout>
       <div>
