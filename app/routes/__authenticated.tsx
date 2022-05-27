@@ -1,8 +1,9 @@
+import type { LoaderFunction } from "@remix-run/node";
 import authenticated from "~/policies/authenticated.server";
 import { json } from "@remix-run/node";
 import { Link, Outlet, useCatch } from "@remix-run/react";
 
-export async function loader({ request }) {
+export const loader: LoaderFunction = async ({ request }) => {
   //console.log(request.headers.get("cookie"));
   return authenticated(
     request,
@@ -13,7 +14,7 @@ export async function loader({ request }) {
       throw new Response("Unauthorized", { status: 401 });
     }
   );
-}
+};
 
 export default function BudgetManagementLayout() {
   return (

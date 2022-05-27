@@ -17,6 +17,8 @@ export const action: ActionFunction = async ({ request }) => {
   if (!formDataSession || !event) {
     return redirect("/login");
   }
+
+  console.log("CHEKCING JSON ", formDataSession);
   const SupabaseSession: Session = JSON.parse(formDataSession);
 
   let session = await authCookie.getSession(request.headers.get("Cookie"));
@@ -29,7 +31,7 @@ export const action: ActionFunction = async ({ request }) => {
   if (event === "SIGNED_IN" || event === "PASSWORD_RECOVERY") {
     if (event === "PASSWORD_RECOVERY") {
       console.log("reset");
-      redirectTo = `/reset?redirectTo=/budget/5/2022`;
+      redirectTo = `/reset`;
     }
     return redirect(redirectTo, {
       headers: {
@@ -43,7 +45,7 @@ export const action: ActionFunction = async ({ request }) => {
 export default function AuthCallback() {
   const fetcher = useFetcher();
   const [searchParams] = useSearchParams();
-
+  console.log(`fetcher=${fetcher}`);
   useEffect(() => {
     const { data: authListener } = supabaseClient.auth.onAuthStateChange(
       (event, session) => {
@@ -63,7 +65,8 @@ export default function AuthCallback() {
     return () => {
       authListener?.unsubscribe();
     };
-  }, [fetcher, searchParams]);
+    //eslint-disable-next-line
+  }, [searchParams]);
 
   return null;
 }

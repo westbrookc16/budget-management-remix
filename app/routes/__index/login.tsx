@@ -102,7 +102,8 @@ export default function Login() {
         </label>
 
         <label className="flex flex-col gap-y-2">
-          Password <input type="password" min={8} name="password" />
+          Password
+          <input type="password" min={8} name="password" />
         </label>
 
         <button className="btn-emerald-700 mt-2" type="submit">

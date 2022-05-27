@@ -41,7 +41,7 @@ export const action: ActionFunction = async ({ request }) => {
   ) {
     return json(
       {
-        formError: `Form not submitted correctly.`,
+        formError: `There was an error in your form. Make sure your passwords match and that your password is greater than 8 characters.`,
         fields: {
           email: String(email) ?? "",
         },
@@ -89,7 +89,7 @@ export default function Register() {
           />
         </div>
         <div className="flex flex-col gap-y-2">
-          <label htmlFor="password">Password</label>
+          <label htmlFor="password">Password (minimum of 8 characters)</label>
           <input type="password" name="password" id="password" />
         </div>
 
