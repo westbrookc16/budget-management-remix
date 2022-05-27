@@ -47,7 +47,7 @@ export default async function authenticated(
 
     return await successFunction(user);
   } catch (error) {
-    console.log(error); // You should log this error to your logging system
+    //console.log(error); // You should log this error to your logging system
     return failureFunction();
   }
 }

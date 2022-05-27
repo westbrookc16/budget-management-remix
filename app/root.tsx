@@ -1,3 +1,4 @@
+import type { LoaderFunction } from "@remix-run/node";
 import { getUserByAccessToken } from "~/api/supabase-auth.server";
 import { authCookie } from "~/services/supabase.server";
 import { json } from "@remix-run/node";
@@ -29,14 +30,12 @@ export function links() {
   return [{ rel: "stylesheet", href: styles }];
 }
 
-export async function loader({ request }) {
+export const loader: LoaderFunction = async ({ request }) => {
   const authSession = await authCookie.getSession(
     request.headers.get("Cookie")
   );
-  const { user, error: getUserError } = await getUserByAccessToken(
-    authSession.get("access_token")
-  );
-  console.log(getUserError);
+  const { user } = await getUserByAccessToken(authSession.get("access_token"));
+
   return json({
     ENV: {
       SUPABASE_URL: process.env.SUPABASE_URL,
@@ -44,15 +43,15 @@ export async function loader({ request }) {
     },
     user,
   });
-}
+};
 
-function Layout({ children }) {
-  const { user } = useLoaderData();
+function Layout({ children }: any) {
+  const { user } = useLoaderData() || {};
   return (
     <div className="h-screen flex flex-col justify-between items-center">
       <NavBar user={user} />
       <div className="px-5">{children}</div>
-      <footer className="w-full flex place-content-center bg-rose-700 text-white py-6 gap-6">
+      <footer className="w-full flex pla  ce-content-center bg-rose-700 text-white py-6 gap-6">
         <a
           className="underline"
           target="_blank"
@@ -145,7 +144,7 @@ export function CatchBoundary() {
   );
 }
 
-export function ErrorBoundary({ error }) {
+export function ErrorBoundary({ error }: any) {
   return (
     <Layout>
       <div>
