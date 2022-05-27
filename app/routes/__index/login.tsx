@@ -114,9 +114,14 @@ export default function Login() {
         <Link className="text-blue-700 font-medium" to="/register">
           Register instead
         </Link>
+        <Link className="text-blue-700 font-medium" to="/forgot">
+          Forgot Your Password
+        </Link>
       </p>
       {actionData?.formError ? (
-        <p style={{ color: "red" }}>{actionData.formError}</p>
+        <div role={"alert"}>
+          <p style={{ color: "red" }}>{actionData.formError}</p>
+        </div>
       ) : null}
     </div>
   );

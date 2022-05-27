@@ -6,7 +6,6 @@ export default function NavBar({ user }: any) {
       <Link to="/">Home</Link>
       {user ? (
         <>
-          <Link to="/profile">Profile</Link>
           <Link
             to={`/budget/${
               new Date().getMonth() + 1

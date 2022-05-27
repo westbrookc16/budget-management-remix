@@ -1,12 +1,17 @@
-import { redirect } from "@remix-run/node";
-import { signOutUser } from "~/api/supabase-auth.server";
-import { authCookie } from "~/services/supabase.server";
+import { signOutUser } from '~/api/supabase-auth.server';
+import { authCookie } from '~/services/supabase.server';
 
-export function loader() {
+import type {
+  ActionFunction,
+  LoaderFunction,
+} from '@remix-run/node';
+import { redirect } from '@remix-run/node';
+
+export const loader: LoaderFunction = () => {
   return redirect("/");
-}
+};
 
-export async function action({ request }) {
+export const action: ActionFunction = async ({ request }) => {
   let session = await authCookie.getSession(request.headers.get("Cookie"));
   if (!session) {
     return redirect("/login");
@@ -20,7 +25,7 @@ export async function action({ request }) {
   return redirect("/login", {
     headers: { "Set-Cookie": await authCookie.destroySession(session) },
   });
-}
+};
 
 export default function Logout() {
   return null;
