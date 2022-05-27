@@ -84,39 +84,36 @@ export default function Login() {
   );
 
   return (
-    <div>
+    <div className="flex flex-col justify-center items-center border-2 border-blue-700 rounded-md p-6 text-center gap-y-4">
       <h1>Login</h1>
-      <div style={{ margin: 5 }}>
-        <AuthProviderBtn provider="google" redirectTo={redirectTo} />
-      </div>
-      <div style={{ margin: 5 }}></div>
+      <AuthProviderBtn provider="google" redirectTo={redirectTo} />
+
       <p>Or continue with email/password</p>
-      <Form replace method="post">
+      <Form className="flex flex-col gap-y-4 w-9/12" replace method="post">
         <input type="hidden" name="redirectTo" value={redirectTo} />
-        <fieldset>
-          <legend>Login</legend>
-          <div style={{ margin: 5 }}>
-            <label>
-              Email{" "}
-              <input
-                type="email"
-                name="email"
-                defaultValue={actionData?.fields?.email}
-              />
-            </label>
-          </div>
-          <div style={{ margin: 5 }}>
-            <label>
-              Password <input type="password" min={8} name="password" />
-            </label>
-          </div>
-          <div style={{ margin: 5 }}>
-            <button type="submit">Login</button>
-          </div>
-        </fieldset>
+
+        <label className="flex flex-col gap-y-2">
+          Email{" "}
+          <input
+            type="email"
+            name="email"
+            defaultValue={actionData?.fields?.email}
+          />
+        </label>
+
+        <label className="flex flex-col gap-y-2">
+          Password <input type="password" min={8} name="password" />
+        </label>
+
+        <button className="btn-emerald-700 mt-2" type="submit">
+          Login
+        </button>
       </Form>
       <p>
-        Don't have an account yet? <Link to="/register">Register</Link> instead
+        Don't have an account yet?{" "}
+        <Link className="text-blue-700 font-medium" to="/register">
+          Register instead
+        </Link>
       </p>
       {actionData?.formError ? (
         <p style={{ color: "red" }}>{actionData.formError}</p>

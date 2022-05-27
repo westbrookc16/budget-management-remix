@@ -15,6 +15,14 @@
     @apply font-semibold py-1 px-4 bg-transparent text-emerald-700 border-2 border-emerald-700 hover:bg-emerald-700 hover:text-white hover:shadow-md focus:bg-emerald-700 focus:text-white focus:shadow-md rounded-md transition-all duration-200;
   }
 
+  .btn-amber-400 {
+    @apply font-semibold py-1 px-4 bg-amber-400 text-blue-700 hover:bg-amber-300 hover:shadow-md focus:bg-amber-300 focus:shadow-md rounded-md transition-all duration-200;
+  }
+
+  .btn-slate-200 {
+    @apply font-semibold py-1 px-4 bg-white border border-slate-200 shadow-sm hover:shadow-md focus:shadow-md rounded-md transition-all duration-200;
+  }
+
   h1 {
     @apply text-blue-700 text-center text-2xl font-bold;
   }

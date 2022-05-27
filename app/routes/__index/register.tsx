@@ -68,46 +68,44 @@ export default function Register() {
   const actionData = useActionData();
 
   return (
-    <div>
+    <div className="flex flex-col justify-center items-center border-2 border-blue-700 rounded-md p-6 text-center gap-y-4">
       <h1>Register</h1>
-      <div>
-        <AuthProviderBtn
-          provider="google"
-          redirectTo={`/budget/${
-            new Date().getMonth() + 1
-          }/${new Date().getFullYear()}`}
-        />
-      </div>
-      <div style={{ margin: 5 }}></div>
-      <p>Or continue with email/password</p>
-      <Form replace method="post">
-        <fieldset>
-          <legend>Register</legend>
-          <div>
-            <label htmlFor="email">Email</label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              defaultValue={actionData?.fields?.email}
-            />
-          </div>
-          <div>
-            <label htmlFor="password">Password</label>
-            <input type="password" name="password" id="password" />
-          </div>
+      <AuthProviderBtn
+        provider="google"
+        redirectTo={`/budget/${
+          new Date().getMonth() + 1
+        }/${new Date().getFullYear()}`}
+      />
 
-          <div>
-            <label htmlFor="password2">Retype Password</label>
-            <input type="password" name="password2" id="password2" />
-          </div>
-          <div>
-            <button type="submit">Register</button>
-          </div>
-        </fieldset>
+      <p>Or continue with email/password</p>
+      <Form className="flex flex-col gap-y-4 w-9/12" replace method="post">
+        <div className="flex flex-col gap-y-2">
+          <label htmlFor="email">Email</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            defaultValue={actionData?.fields?.email}
+          />
+        </div>
+        <div className="flex flex-col gap-y-2">
+          <label htmlFor="password">Password</label>
+          <input type="password" name="password" id="password" />
+        </div>
+
+        <div className="flex flex-col gap-y-2">
+          <label htmlFor="password2">Retype Password</label>
+          <input type="password" name="password2" id="password2" />
+        </div>
+        <button className="btn-emerald-700 mt-2" type="submit">
+          Register
+        </button>
       </Form>
       <p>
-        Have an account? <Link to="/login">Login</Link> instead
+        Have an account?{" "}
+        <Link className="text-blue-700 font-medium" to="/login">
+          Login instead
+        </Link>
       </p>
       {actionData?.formError ? (
         <div role="alert" style={{ color: "red" }}>

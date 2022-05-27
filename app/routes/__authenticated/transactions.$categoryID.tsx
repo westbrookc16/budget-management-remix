@@ -128,6 +128,7 @@ export default function Transactions() {
             name="_action"
             form={`transactions-${id}`}
             value="Update"
+            className="btn-emerald-700"
           />
           <input
             type="hidden"
@@ -142,6 +143,7 @@ export default function Transactions() {
             name="_action"
             form={`transactions-${id}`}
             value="Delete"
+            className="btn-rose-700"
           />
         </td>
       </tr>
@@ -155,42 +157,58 @@ export default function Transactions() {
   const data = useActionData<ActionData>();
 
   return (
-    <div>
+    <div className="flex flex-col py-7 place-items-center gap-y-4">
       <h1>Transactions for {category.name}</h1>
-      <Form method="post">
-        <label htmlFor="name">Name</label>
-        <input type="text" name="name" id="name" required />
-        <label htmlFor="transaction_date">Date</label>
-        <input
-          type="text"
-          name="transaction_date"
-          id="transaction_date"
-          aria-describedby="errorTransaction_date"
-        />
-        {data?.fieldErrors?.transaction_date && (
-          <span id="errorTransaction_date">
-            {data?.fieldErrors?.transaction_date}
-          </span>
-        )}
-        <label htmlFor="amount">Amount</label>
-        <input
-          type="text"
-          name="amount"
-          id="amount"
-          aria-describedby="errorAmount"
-        />
-        {data?.fieldErrors?.amount && (
-          <span id="errorAmount">{data.fieldErrors.amount}</span>
-        )}
-        <button
-          type="submit"
-          name="_action"
-          value="insert"
-          disabled={transition.state !== "idle"}
-          aria-live="polite"
-        >
-          Add
-        </button>
+      <Form
+        className="border-2 border-blue-700 rounded-md flex flex-col max-w-2xl p-6 gap-y-4"
+        method="post"
+      >
+        <div className="flex gap-x-4">
+          <div className="flex flex-col w-1/2">
+            <label htmlFor="name">Name</label>
+            <input type="text" name="name" id="name" required />
+          </div>
+          <div className="flex flex-col w-1/2">
+            <label htmlFor="transaction_date">Date</label>
+            <input
+              type="text"
+              name="transaction_date"
+              required={true}
+              id="transaction_date"
+              aria-describedby="errorTransaction_date"
+            />
+            {data?.fieldErrors?.transaction_date && (
+              <span id="errorTransaction_date">
+                {data?.fieldErrors?.transaction_date}
+              </span>
+            )}
+          </div>
+        </div>
+        <div className="flex flex-col">
+          <label htmlFor="amount">Amount</label>
+          <input
+            required
+            type="text"
+            name="amount"
+            id="amount"
+            aria-describedby="errorAmount"
+          />
+          {data?.fieldErrors?.amount && (
+            <span id="errorAmount">{data.fieldErrors.amount}</span>
+          )}
+        </div>
+        <div className="flex justify-center">
+          <button
+            type="submit"
+            name="_action"
+            value="insert"
+            disabled={transition.state !== "idle"}
+            aria-live="polite"
+            className="btn-emerald-700"
+          >
+            Add
+          </button>
+        </div>
       </Form>
 
       {data?.formMessage && transition.state === "idle" && (
@@ -209,8 +227,7 @@ export default function Transactions() {
         </thead>
         <tbody>{trs}</tbody>
       </table>
-
-      {forms}
+      <div className="h-0">{forms}</div>
     </div>
   );
 }
