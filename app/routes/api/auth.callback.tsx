@@ -65,7 +65,6 @@ export default function AuthCallback() {
     return () => {
       authListener?.unsubscribe();
     };
-    //eslint-disable-next-line
   }, [searchParams]);
 
   return null;

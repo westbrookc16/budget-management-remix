@@ -18,17 +18,25 @@ export default function ForgotPassword() {
   const { formMessage } = useActionData() || {};
   const transition = useTransition();
   return (
-    <div>
+    <div className="flex flex-col justify-center items-center border-2 border-blue-700 rounded-md p-6 text-center gap-y-4">
       <h1>Forgot Your Password</h1>
-      Enter your email and a reset link will be sent to you to allow you to
-      update your password.
-      <Form method="post">
-        <label htmlFor="email">Email</label>
-        <input type="email" id="email" autoComplete="email" name="email" />
-        <button type="submit">Send Reset Link</button>
+      <p className="max-w-md">
+        Enter your email and a reset link will be sent to you to allow you to
+        update your password.
+      </p>
+      <Form className="flex flex-col gap-y-4 w-9/12" method="post">
+        <div className="flex flex-col gap-y-2">
+          <label htmlFor="email">Email</label>
+          <input type="email" id="email" autoComplete="email" name="email" />
+        </div>
+        <button className="btn-emerald-700 mt-2" type="submit">
+          Send Reset Link
+        </button>
       </Form>
       {formMessage && transition.state === "idle" && (
-        <div role="alert">{formMessage}</div>
+        <div className="text-rose-700" role="alert">
+          {formMessage}
+        </div>
       )}
     </div>
   );

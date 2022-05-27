@@ -30,19 +30,29 @@ export default function ResetPassword() {
   const transition = useTransition();
   const data = useActionData<ActionData>();
   return (
-    <div>
+    <div className="flex flex-col justify-center items-center border-2 border-blue-700 rounded-md p-6 text-center gap-y-4">
       <h1>Reset Password</h1>
-      <Form method="post">
-        <label htmlFor="password">
-          Enter Password (must be a minimum of 8 characters)
-        </label>
-        <input type="password" id="password" name="password" />
-        <label htmlFor="password1">Confirm Password</label>
-        <input type="password" id="password1" name="password1" />
-        <button type="submit">Reset Password</button>
+      <Form className="flex flex-col gap-y-4 w-9/12" method="post">
+        <div className="flex flex-col gap-y-2">
+          <label htmlFor="password">
+            Enter Password (must be a minimum of 8 characters)
+          </label>
+          <input type="password" id="password" name="password" />
+        </div>
+
+        <div className="flex flex-col gap-y-2">
+          <label htmlFor="password1">Confirm Password</label>
+          <input type="password" id="password1" name="password1" />
+        </div>
+
+        <button className="btn-emerald-700 mt-2" type="submit">
+          Reset Password
+        </button>
       </Form>
       {data?.formError && transition.state === "idle" && (
-        <div role="alert">{data.formError}</div>
+        <div className="text-rose-700" role="alert">
+          {data.formError}
+        </div>
       )}
     </div>
   );
